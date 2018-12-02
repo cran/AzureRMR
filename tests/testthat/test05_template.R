@@ -1,0 +1,55 @@
+context("Templates")
+
+tenant <- Sys.getenv("AZ_TEST_TENANT_ID")
+app <- Sys.getenv("AZ_TEST_APP_ID")
+password <- Sys.getenv("AZ_TEST_PASSWORD")
+subscription <- Sys.getenv("AZ_TEST_SUBSCRIPTION")
+
+if(tenant == "" || app == "" || password == "" || subscription == "")
+    skip("Resource group method tests skipped: ARM credentials not set")
+
+rgname <- paste(sample(letters, 20, replace=TRUE), collapse="")
+rg <- az_rm$
+    new(tenant=tenant, app=app, password=password)$
+    get_subscription(subscription)$
+    create_resource_group(rgname, location="australiaeast")
+
+
+test_that("Template methods work",
+{
+    # precondition
+    expect_true(is_empty(rg$list_resources()))
+
+    # simple storage account template
+    tplname <- paste(sample(letters, 10, replace=TRUE), collapse="")
+    template <- "../resources/template.json"
+    parameters <- jsonlite::toJSON(list(
+        location=list(value="australiaeast"),
+        name=list(value=tplname)
+    ), auto_unbox=TRUE)
+
+    tpl <- rg$deploy_template(tplname, template=template, parameters=parameters, wait=TRUE)
+    tpl$check()
+    expect_is(tpl, "az_template")
+    expect_false(is_empty(rg$list_resources()))
+
+    tpl$delete(confirm=FALSE, free_resources=TRUE)
+    expect_true(is_empty(rg$list_resources()))
+
+    tplname2 <- paste(sample(letters, 10, replace=TRUE), collapse="")
+    tpl_parsed <- jsonlite::fromJSON(template, simplifyVector=FALSE)
+    parm_parsed <- list(
+        location="australiaeast",
+        name=tplname2
+    )
+
+    tpl2 <- rg$deploy_template(tplname2, template=tpl_parsed, parameters=parm_parsed, wait=TRUE)
+    tpl2$check()
+    expect_is(tpl2, "az_template")
+    expect_false(is_empty(rg$list_resources()))
+
+    tpl2$delete(confirm=FALSE, free_resources=TRUE)
+    expect_true(is_empty(rg$list_resources()))
+})
+
+rg$delete(confirm=FALSE)

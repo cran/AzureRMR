@@ -2,7 +2,6 @@
 #'
 #' Miscellaneous functions for printing Azure R6 objects
 #'
-#' @param token An Azure OAuth token.
 #' @param env An R6 object's environment for printing.
 #' @param exclude Objects in `env` to exclude from the printout.
 #'
@@ -11,38 +10,20 @@
 #'
 #' @rdname format
 #' @export
-format_auth_header <- function(token)
-{
-    expiry <- as.POSIXct(as.numeric(token$credentials$expires_on), origin="1970-01-01")
-    obtained <- expiry - as.numeric(token$credentials$expires_in)
-    host <- token$credentials$resource
-    tenant <- sub("/.+$", "", httr::parse_url(token$endpoint$access)$path)
-
-    paste0("  Authentication details:\n",
-           "    host: ", host, "\n",
-           "    tenant: ", tenant, "\n",
-           "    token obtained: ", format(obtained, usetz=TRUE), "\n",
-           "    token valid to: ", format(expiry, usetz=TRUE), "\n",
-           "---\n")
-}
-
-
-#' @rdname format
-#' @export
 format_public_fields <- function(env, exclude=character(0))
 {
     objnames <- ls(env)
     std_fields <- "token"
     objnames <- setdiff(objnames, c(exclude, std_fields))
-    is_method <- sapply(objnames, function(obj) is.function(.subset2(env, obj)))
 
     maxwidth <- as.integer(0.8 * getOption("width"))
-
-    objnames <- objnames[!is_method]
+ 
     objconts <- sapply(objnames, function(n)
     {
         x <- get(n, env)
-        deparsed <- if(is.list(x))
+        deparsed <- if(is_empty(x) || is.function(x)) # don't print empty fields
+            return(NULL)
+        else if(is.list(x))
             paste0("list(", paste(names(x), collapse=", "), ")")
         else if(is.vector(x))
         {
@@ -55,7 +36,15 @@ format_public_fields <- function(env, exclude=character(0))
 
         paste0(strwrap(paste0(n, ": ", deparsed), width=maxwidth, indent=2, exdent=4),
                collapse="\n")
-    })
+    }, simplify=FALSE)
+    
+    empty <- sapply(objconts, is.null)
+    objconts <- objconts[!empty]
+
+    # print etag at the bottom, not the top
+    if("etag" %in% names(objconts))
+        objconts <- c(objconts[-which(names(objconts) == "etag")], objconts["etag"])
+
     paste0(paste0(objconts, collapse="\n"), "\n---\n")
 }
 

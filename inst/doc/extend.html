@@ -164,7 +164,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="st">    </span><span class="kw">get_resource_group</span>(<span class="st">&quot;resgroup&quot;</span>) $
 <span class="st">    </span><span class="kw">get_my_resource</span>(<span class="st">&quot;myresource&quot;</span>)</code></pre></div>
 <p>Note that if you are writing a package that extends AzureRMR, these methods <em>must</em> be defined in the package’s <code>.onLoad</code> function. This is because the methods must be added at runtime, when the user loads your package, rather than at compile time, when it is built or installed.</p>
-<p>The <code>create_storage_account</code>, <code>get_storage_account</code> and <code>delete_storage_account</code> methods from the AzureStor package are defined like this:</p>
+<p>The <code>create_storage_account</code>, <code>get_storage_account</code> and <code>delete_storage_account</code> methods from the AzureStor package are defined like this. Note that calls to your class methods should include the <code>pkgname::</code> qualifier, to ensure they will work even if your package is not attached.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># all methods adding methods to classes in external package must go in .onLoad</span>
 .onLoad &lt;-<span class="st"> </span>function(libname, pkgname)
 {
@@ -174,16 +174,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
              <span class="dt">sku=</span><span class="kw">list</span>(<span class="dt">name=</span><span class="st">&quot;Standard_LRS&quot;</span>, <span class="dt">tier=</span><span class="st">&quot;Standard&quot;</span>),
              ...)
     {
-        az_storage$<span class="kw">new</span>(self$token, self$subscription, self$name,
-                       <span class="dt">type=</span><span class="st">&quot;Microsoft.Storage/storageAccounts&quot;</span>, <span class="dt">name=</span>name, <span class="dt">location=</span>location,
-                       <span class="dt">kind=</span>kind, <span class="dt">sku=</span>sku, ...)
+        AzureStor::az_storage$<span class="kw">new</span>(self$token, self$subscription, self$name,
+            <span class="dt">type=</span><span class="st">&quot;Microsoft.Storage/storageAccounts&quot;</span>, <span class="dt">name=</span>name, <span class="dt">location=</span>location,
+            <span class="dt">kind=</span>kind, <span class="dt">sku=</span>sku, ...)
     })
 
     AzureRMR::az_resource_group$<span class="kw">set</span>(<span class="st">&quot;public&quot;</span>, <span class="st">&quot;get_storage_account&quot;</span>, <span class="dt">overwrite=</span><span class="ot">TRUE</span>,
     function(name)
     {
-        az_storage$<span class="kw">new</span>(self$token, self$subscription, self$name,
-                       <span class="dt">type=</span><span class="st">&quot;Microsoft.Storage/storageAccounts&quot;</span>, <span class="dt">name=</span>name)
+        AzureStor::az_storage$<span class="kw">new</span>(self$token, self$subscription, self$name,
+            <span class="dt">type=</span><span class="st">&quot;Microsoft.Storage/storageAccounts&quot;</span>, <span class="dt">name=</span>name)
     })
 
     AzureRMR::az_resource_group$<span class="kw">set</span>(<span class="st">&quot;public&quot;</span>, <span class="st">&quot;delete_storage_account&quot;</span>, <span class="dt">overwrite=</span><span class="ot">TRUE</span>,
@@ -223,8 +223,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
                 <span class="dt">ext_file_uris=</span>ext_file_uris, <span class="dt">inst_command=</span>inst_command,
                 <span class="dt">clust_size=</span>clust_size, <span class="dt">template=</span>template)
 
-        az_vm_template$<span class="kw">new</span>(self$token, self$subscription, self$name, name,
-                           <span class="dt">template=</span>template, <span class="dt">parameters=</span>parameters, ..., <span class="dt">wait=</span>wait)
+        AzureVM::az_vm_template$<span class="kw">new</span>(self$token, self$subscription, self$name, name,
+            <span class="dt">template=</span>template, <span class="dt">parameters=</span>parameters, ..., <span class="dt">wait=</span>wait)
     })
 
     <span class="co"># ... other startup code ...</span>

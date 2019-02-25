@@ -15,11 +15,18 @@ Class representing a generic Azure resource.
 
 \itemize{
 \item \code{new(...)}: Initialize a new resource object. See 'Initialization' for more details.
-\item \code{delete(..., confirm=TRUE, wait=FALSE)}: Delete this resource, after a confirmation check. Optionally wait for the delete to finish.
+\item \code{delete(confirm=TRUE, wait=FALSE)}: Delete this resource, after a confirmation check. Optionally wait for the delete to finish.
 \item \code{update(...)}: Update this resource on the host.
-\item \code{sync_fields()}: Update the fields in this object with information from the host. Returns the \code{properties$provisioningState} field, so you can query this programmatically to check if a resource has finished provisioning. Not all resource types require explicit provisioning, in which case this method will return NULL.
-\item \code{set_api_version(api_version)}: Set the API version to use when interacting with the host. By default, use the latest API version available.
-\item \code{do_operation(...)} Carry out an operation. See 'Operations' for more details.
+\item \code{sync_fields()}: Synchronise the R object with the resource it represents in Azure. Returns the \code{properties$provisioningState} field, so you can query this programmatically to check if a resource has finished provisioning. Not all resource types require explicit provisioning, in which case this method will return NULL.
+\item \code{set_api_version(api_version, stable_only=TRUE)}: Set the API version to use when interacting with the host. If \code{api_version} is not supplied, use the latest version available, either the latest stable version (if \code{stable_only=TRUE}) or the latest preview version (if \code{stable_only=FALSE}).
+\item \code{get_api_version()}: Get the current API version.
+\item \code{do_operation(...)}: Carry out an operation. See 'Operations' for more details.
+\item \code{set_tags(..., keep_existing=TRUE)}: Set the tags on this resource. The tags can be either names or name-value pairs. To delete a tag, set it to \code{NULL}.
+\item \code{get_tags()}: Get the tags on this resource.
+\item \code{create_lock(name, level)}: Create a management lock on this resource. The \code{level} argument can be either "cannotdelete" or "readonly". Note if you logged in via a custom service principal, it must have "Owner" or "User Access Administrator" access to manage locks.
+\item \code{get_lock(name}): Returns a management lock object.
+\item \code{delete_lock(name)}: Deletes a management lock object.
+\item \code{list_locks()}: List all locks that apply to this resource. Note this includes locks created at the subscription or resource group level.
 }
 }
 

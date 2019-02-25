@@ -17,17 +17,21 @@ Base class for interacting with Azure Resource Manager.
 \item \code{new(tenant, app, ...)}: Initialize a new ARM connection with the given credentials. See 'Authentication` for more details.
 \item \code{list_subscriptions()}: Returns a list of objects, one for each subscription associated with this app ID.
 \item \code{get_subscription(id)}: Returns an object representing a subscription.
+\item \code{get_subscription_by_name(name)}: Returns the subscription with the given name (as opposed to a GUID).
 }
 }
 
 \section{Authentication}{
 
-To authenticate with ARM, provide the following arguments to the \code{new} method:
+The recommended way to authenticate with ARM is via the \link{get_azure_login} function, which creates a new instance of this class.
+
+To authenticate with the \code{az_rm} class directly, provide the following arguments to the \code{new} method:
 \itemize{
-\item \code{tenant}: Your tenant ID.
-\item \code{app}: Your client/app ID which you registered in Azure Active Directory.
-\item \code{auth_type}: Either \code{"client_credentials"} (the default) or \code{"device_code"}.
-\item \code{password}: if \code{auth_type == "client_credentials"}, your password.
+\item \code{tenant}: Your tenant ID. This can be a name ("myaadtenant"), a fully qualified domain name ("myaadtenant.onmicrosoft.com" or "mycompanyname.com"), or a GUID.
+\item \code{app}: The client/app ID to use to authenticate with Azure Active Directory. The default is to login interactively using the Azure CLI cross-platform app, but it's recommended to supply your own app credentials if possible.
+\item \code{password}: if \code{auth_type == "client_credentials"}, the app secret; if \code{auth_type == "resource_owner"}, your account password.
+\item \code{username}: if \code{auth_type == "resource_owner"}, your username.
+\item \code{auth_type}: The OAuth authentication method to use, one of "client_credentials", "authorization_code", "device_code" or "resource_owner". See \link{get_azure_token} for how the default method is chosen, along with some caveats.
 \item \code{host}: your ARM host. Defaults to \code{https://management.azure.com/}. Change this if you are using a government or private cloud.
 \item \code{aad_host}: Azure Active Directory host for authentication. Defaults to \code{https://login.microsoftonline.com/}. Change this if you are using a government or private cloud.
 \item \code{config_file}: Optionally, a JSON file containing any of the arguments listed above. Arguments supplied in this file take priority over those supplied on the command line. You can also use the output from the Azure CLI \code{az ad sp create-for-rbac} command.
@@ -56,7 +60,7 @@ az$get_subscription("subscription_id")
 }
 }
 \seealso{
-\link{get_azure_token}, \link{AzureToken},
+\link{create_azure_login}, \link{get_azure_token}, \link{AzureToken},
 \href{https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview}{Azure Resource Manager overview},
 \href{https://docs.microsoft.com/en-us/rest/api/resources/}{REST API reference}
 }

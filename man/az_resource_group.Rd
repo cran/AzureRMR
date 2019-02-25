@@ -16,6 +16,7 @@ Class representing an Azure resource group.
 \itemize{
 \item \code{new(token, subscription, id, ...)}: Initialize a resource group object. See 'Initialization' for more details.
 \item \code{delete(confirm=TRUE)}: Delete this resource group, after a confirmation check. This is asynchronous: while the method returns immediately, the delete operation continues on the host in the background. For resource groups containing a large number of deployed resources, this may take some time to complete.
+\item \code{sync_fields()}: Synchronise the R object with the resource group it represents in Azure.
 \item \code{list_templates()}: List deployed templates in this resource group.
 \item \code{get_template(name)}: Return an object representing an existing template.
 \item \code{deploy_template(...)}: Deploy a new template. See 'Templates' for more details.
@@ -25,6 +26,12 @@ Class representing an Azure resource group.
 \item \code{delete_resource(..., confirm=TRUE, wait=FALSE)}: Delete an existing resource. Optionally wait for the delete to finish.
 \item \code{resource_exists(...)}: Check if a resource exists.
 \item \code{list_resources()}: Return a list of resource group objects for this subscription.
+\item \code{set_tags(..., keep_existing=TRUE)}: Set the tags on this resource group. The tags can be either names or name-value pairs. To delete a tag, set it to \code{NULL}.
+\item \code{get_tags()}: Get the tags on this resource.
+\item \code{create_lock(name, level)}: Create a management lock on this resource group (which will propagate to all resources within it). The \code{level} argument can be either "cannotdelete" or "readonly". Note if you logged in via a custom service principal, it must have "Owner" or "User Access Administrator" access to manage locks.
+\item \code{get_lock(name}): Returns a management lock object.
+\item \code{delete_lock(name)}: Deletes a management lock object.
+\item \code{list_locks()}: List all locks that apply to this resource group. Note this includes locks created at the subscription level, and for any resources within the resource group.
 }
 }
 
@@ -48,6 +55,7 @@ To deploy a new template, pass the following arguments to \code{deploy_template(
 \item A URL from which the template can be downloaded
 }
 \item \code{parameters}: The parameters for the template. This can be provided using any of the same methods as the \code{template} argument.
+\item \code{wait}: Optionally, whether or not to wait until the deployment is complete before returning. Defaults to \code{FALSE}.
 }
 
 Retrieving or deleting a deployed template requires only the name of the deployment.
@@ -66,15 +74,14 @@ There are a number of arguments to \code{get_resource()}, \code{create_resource(
 
 Providing the \code{id} argument will fill in the values for all the other arguments. Similarly, providing the \code{type} argument will fill in the values for \code{provider} and \code{path}. Unless you provide \code{id}, you must also provide \code{name}.
 
-To create/deploy a new resource, specify any extra parameters that the provider needs as named arguments to \code{create_resource()}.
+To create/deploy a new resource, specify any extra parameters that the provider needs as named arguments to \code{create_resource()}. Like \code{deploy_template()}, \code{create_resource()} also takes an optional \code{wait} argument that specifies whether to wait until resource creation is complete before returning.
 }
 
 \examples{
 \dontrun{
 
 # recommended way to retrieve a resource group object
-rg <- az_rm$
-    new(tenant="myaadtenant.onmicrosoft.com", app="app_id", password="password")$
+rg <- get_azure_login("myaadtenant")$
     get_subscription("subscription_id")$
     get_resource_group("rgname")
 

@@ -6,6 +6,7 @@
 #' @section Methods:
 #' - `new(token, subscription, id, ...)`: Initialize a resource group object. See 'Initialization' for more details.
 #' - `delete(confirm=TRUE)`: Delete this resource group, after a confirmation check. This is asynchronous: while the method returns immediately, the delete operation continues on the host in the background. For resource groups containing a large number of deployed resources, this may take some time to complete.
+#' - `sync_fields()`: Synchronise the R object with the resource group it represents in Azure.
 #' - `list_templates()`: List deployed templates in this resource group.
 #' - `get_template(name)`: Return an object representing an existing template.
 #' - `deploy_template(...)`: Deploy a new template. See 'Templates' for more details.
@@ -15,6 +16,12 @@
 #' - `delete_resource(..., confirm=TRUE, wait=FALSE)`: Delete an existing resource. Optionally wait for the delete to finish.
 #' - `resource_exists(...)`: Check if a resource exists.
 #' - `list_resources()`: Return a list of resource group objects for this subscription.
+#' - `set_tags(..., keep_existing=TRUE)`: Set the tags on this resource group. The tags can be either names or name-value pairs. To delete a tag, set it to `NULL`.
+#' - `get_tags()`: Get the tags on this resource.
+#' - `create_lock(name, level)`: Create a management lock on this resource group (which will propagate to all resources within it). The `level` argument can be either "cannotdelete" or "readonly". Note if you logged in via a custom service principal, it must have "Owner" or "User Access Administrator" access to manage locks.
+#' - `get_lock(name`): Returns a management lock object.
+#' - `delete_lock(name)`: Deletes a management lock object.
+#' - `list_locks()`: List all locks that apply to this resource group. Note this includes locks created at the subscription level, and for any resources within the resource group.
 #'
 #' @section Initialization:
 #' Initializing a new object of this class can either retrieve an existing resource group, or create a new resource group on the host. Generally, the easiest way to create a resource group object is via the `get_resource_group`, `create_resource_group` or `list_resource_groups` methods of the [az_subscription] class, which handle this automatically.
@@ -30,6 +37,7 @@
 #'   3. A vector of strings containing unparsed JSON
 #'   4. A URL from which the template can be downloaded
 #' - `parameters`: The parameters for the template. This can be provided using any of the same methods as the `template` argument.
+#' - `wait`: Optionally, whether or not to wait until the deployment is complete before returning. Defaults to `FALSE`.
 #'
 #' Retrieving or deleting a deployed template requires only the name of the deployment.
 #'
@@ -43,7 +51,7 @@
 #'
 #' Providing the `id` argument will fill in the values for all the other arguments. Similarly, providing the `type` argument will fill in the values for `provider` and `path`. Unless you provide `id`, you must also provide `name`.
 #'
-#' To create/deploy a new resource, specify any extra parameters that the provider needs as named arguments to `create_resource()`.
+#' To create/deploy a new resource, specify any extra parameters that the provider needs as named arguments to `create_resource()`. Like `deploy_template()`, `create_resource()` also takes an optional `wait` argument that specifies whether to wait until resource creation is complete before returning.
 #'
 #' @seealso
 #' [az_subscription], [az_template], [az_resource],
@@ -55,8 +63,7 @@
 #' \dontrun{
 #' 
 #' # recommended way to retrieve a resource group object
-#' rg <- az_rm$
-#'     new(tenant="myaadtenant.onmicrosoft.com", app="app_id", password="password")$
+#' rg <- get_azure_login("myaadtenant")$
 #'     get_subscription("subscription_id")$
 #'     get_resource_group("rgname")
 #'
@@ -176,7 +183,8 @@ public=list(
     list_resources=function()
     {
         cont <- private$rg_op("resources")
-        lst <- lapply(cont$value, function(parms) az_resource$new(self$token, self$subscription, deployed_properties=parms))
+        lst <- lapply(cont$value, function(parms)
+            az_resource$new(self$token, self$subscription, deployed_properties=parms))
         # keep going until paging is complete
         while(!is_empty(cont$nextLink))
         {
@@ -202,21 +210,110 @@ public=list(
         !inherits(res, "try-error")
     },
 
-    delete_resource=function(provider, path, type, name, id, api_version=NULL, ..., confirm=TRUE, wait=FALSE)
+    delete_resource=function(provider, path, type, name, id, api_version=NULL, confirm=TRUE, wait=FALSE)
     {
         # supply deployed_properties arg to prevent querying host for resource info
         az_resource$
             new(self$token, self$subscription, self$name,
                 provider=provider, path=path, type=type, name=name, id=id,
                 deployed_properties=list(NULL), api_version=api_version)$
-            delete(..., api_version=api_version, confirm=confirm, wait=wait)
+            delete(confirm=confirm, wait=wait)
     },
 
-    create_resource=function(provider, path, type, name, id, ...)
+    create_resource=function(provider, path, type, name, id, location=self$location, ...)
     {
         az_resource$new(self$token, self$subscription,
                         resource_group=self$name, provider=provider, path=path, type=type, name=name, id=id,
-                        location=self$location, ...)
+                        location=location, ...)
+    },
+
+    sync_fields=function()
+    {
+        self$initialize(self$token, self$subscription, name=self$name)
+        invisible(NULL)
+    },
+
+    set_tags=function(..., keep_existing=TRUE)
+    {
+        # if tags is uninitialized (NULL), set it to named list
+        if(is.null(self$tags))
+            self$tags <- named_list()
+
+        tags <- match.call(expand.dots=FALSE)$...
+        unvalued <- if(is.null(names(tags)))
+            rep(TRUE, length(tags))
+        else names(tags) == ""
+
+        values <- lapply(seq_along(unvalued), function(i)
+        {
+            if(unvalued[i]) "" else as.character(eval.parent(tags[[i]]))
+        })
+        names(values) <- ifelse(unvalued, as.character(tags), names(tags))
+
+        if(keep_existing)
+            values <- modifyList(self$tags, values)
+
+        # delete tags specified to be null
+        values <- values[!sapply(values, is_empty)]
+
+        private$rg_op(body=jsonlite::toJSON(list(tags=values), auto_unbox=TRUE, digits=22),
+            encode="raw", http_verb="PATCH")
+        self$sync_fields()
+    },
+
+    get_tags=function()
+    {
+        if(is.null(self$tags))
+            named_list()
+        else self$tags
+    },
+
+    create_lock=function(name, level=c("cannotdelete", "readonly"), notes="")
+    {
+        level <- match.arg(level)
+        api <- getOption("azure_api_mgmt_version")
+        op <- file.path("providers/Microsoft.Authorization/locks", name)
+        body <- list(properties=list(level=level))
+        if(notes != "")
+            body$notes <- notes
+
+        res <- private$rg_op(op, body=body, encode="json", http_verb="PUT", api_version=api)
+        az_resource$new(self$token, self$subscription, deployed_properties=res, api_version=api)
+    },
+
+    get_lock=function(name)
+    {
+        api <- getOption("azure_api_mgmt_version")
+        op <- file.path("providers/Microsoft.Authorization/locks", name)
+        res <- private$rg_op(op, api_version=api)
+        az_resource$new(self$token, self$subscription, deployed_properties=res, api_version=api)
+    },
+
+    delete_lock=function(name)
+    {
+        api <- getOption("azure_api_mgmt_version")
+        op <- file.path("providers/Microsoft.Authorization/locks", name)
+        private$rg_op(op, http_verb="DELETE", api_version=api)
+        invisible(NULL)
+    },
+
+    list_locks=function()
+    {
+        api <- getOption("azure_api_mgmt_version")
+        op <- "providers/Microsoft.Authorization/locks"
+        cont <- private$rg_op(op, api_version=api)
+
+        lst <- lapply(cont$value, function(parms)
+            az_resource$new(self$token, self$subscription, deployed_properties=parms, api_version=api))
+        # keep going until paging is complete
+        while(!is_empty(cont$nextLink))
+        {
+            cont <- call_azure_url(self$token, cont$nextLink)
+            lst <- c(lst, lapply(cont$value, function(parms)
+                az_resource$new(self$token, self$subscription, deployed_properties=parms, api_version=api)))
+        }
+        names(lst) <- sapply(lst, function(x) sub("^.+providers/(.+$)", "\\1", x$id))
+        lst
     },
 
     print=function(...)
@@ -224,7 +321,7 @@ public=list(
         cat("<Azure resource group ", self$name, ">\n", sep="")
         cat(format_public_fields(self, exclude=c("subscription", "name")))
         cat(format_public_methods(self))
-        invisible(NULL)
+        invisible(self)
     }
 ),
 

@@ -97,16 +97,16 @@
 #               sku=list(name="Standard_LRS", tier="Standard"),
 #               ...)
 #      {
-#          az_storage$new(self$token, self$subscription, self$name,
-#                         type="Microsoft.Storage/storageAccounts", name=name, location=location,
-#                         kind=kind, sku=sku, ...)
+#          AzureStor::az_storage$new(self$token, self$subscription, self$name,
+#              type="Microsoft.Storage/storageAccounts", name=name, location=location,
+#              kind=kind, sku=sku, ...)
 #      })
 #  
 #      AzureRMR::az_resource_group$set("public", "get_storage_account", overwrite=TRUE,
 #      function(name)
 #      {
-#          az_storage$new(self$token, self$subscription, self$name,
-#                         type="Microsoft.Storage/storageAccounts", name=name)
+#          AzureStor::az_storage$new(self$token, self$subscription, self$name,
+#              type="Microsoft.Storage/storageAccounts", name=name)
 #      })
 #  
 #      AzureRMR::az_resource_group$set("public", "delete_storage_account", overwrite=TRUE,
@@ -147,8 +147,8 @@
 #                  ext_file_uris=ext_file_uris, inst_command=inst_command,
 #                  clust_size=clust_size, template=template)
 #  
-#          az_vm_template$new(self$token, self$subscription, self$name, name,
-#                             template=template, parameters=parameters, ..., wait=wait)
+#          AzureVM::az_vm_template$new(self$token, self$subscription, self$name, name,
+#              template=template, parameters=parameters, ..., wait=wait)
 #      })
 #  
 #      # ... other startup code ...

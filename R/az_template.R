@@ -72,7 +72,7 @@ public=list(
         self$subscription <- subscription
         self$resource_group <- resource_group
 
-        parms <- if(!is_empty(name) && !missing(template) && !missing(parameters))
+        parms <- if(!is_empty(name) && !missing(template))
             private$init_and_deploy(name, template, parameters, ..., wait=wait)
         else if(!is_empty(name))
             private$init_from_host(name)
@@ -166,7 +166,7 @@ public=list(
         cat("<Azure template ", self$name, ">\n", sep="")
         cat(format_public_fields(self, exclude=c("subscription", "resource_group", "name")))
         cat(format_public_methods(self))
-        invisible(NULL)
+        invisible(self)
     }
 ),
 
@@ -197,6 +197,11 @@ private=list(
         properties <- modifyList(default_properties, list(...))
         private$validate_deploy_parms(properties)
 
+        # handle case of missing or empty parameters arg
+        # must be a _named_ list for jsonlite to turn into an object, not an array
+        if(missing(parameters) || is_empty(parameters))
+            parameters <- structure(list(), names=character(0))
+
         # fold template data into list of properties
         properties <- if(is.list(template))
             modifyList(properties, list(template=template))
@@ -205,14 +210,17 @@ private=list(
         else modifyList(properties, list(template=jsonlite::fromJSON(template, simplifyVector=FALSE)))
 
         # fold parameter data into list of properties
-        properties <- if(is.list(parameters))
+        properties <- if(is_empty(parameters))
+            modifyList(properties, list(parameters=parameters))
+        else if(is.list(parameters))
             modifyList(properties, list(parameters=private$make_param_list(parameters)))
         else if(is_url(parameters))
             modifyList(properties, list(parametersLink=list(uri=parameters)))
         else modifyList(properties, list(parameters=jsonlite::fromJSON(parameters, simplifyVector=FALSE)))
 
         self$name <- name
-        parms <- private$tpl_op(body=list(properties=properties), encode="json", http_verb="PUT")
+        parms <- private$tpl_op(body=jsonlite::toJSON(list(properties=properties), auto_unbox=TRUE, digits=22),
+            encode="raw", http_verb="PUT")
 
         # do we wait until template has finished provisioning?
         if(wait)

@@ -1,69 +1,85 @@
 ## ---- eval=FALSE---------------------------------------------------------
-#  # authenticate with a password
-#  az <- az_rm$new(tenant="xxx-xxx-xxx",
-#                  app="yyy-yyy-yyy",
-#                  password="{your-password}")
+#  library(AzureRMR)
+#  #> AzureRMR can cache Azure Active Directory tokens and Resource Manager logins in the directory:
+#  #>
+#  #> C:\Users\hongooi\AppData\Local\AzureR\AzureRMR
+#  #>
+#  #> This saves you having to reauthenticate with Azure in future sessions. Create this directory? (Y/n) y
 #  
-#  # authenticate with device code: R will display a code to enter in your browser
-#  az2 <- az_rm$new(tenant="xxx-xxx-xxx",
-#                   app="zzz-zzz-zzz",
-#                   auth_type="device")
+#  AzureR_dir()
+#  #> [1] "C:\\Users\\hongooi\\AppData\\Local\\AzureR"
 #  
-#  # authenticate with credentials stored in a JSON file
-#  az3 <- az_rm$new(config_file="creds.json")
+#  
+#  # if this is the first time you're logging in
+#  az <- create_azure_login()
+#  #> Creating Azure Resource Manager login for default tenant
+#  #> Waiting for authentication in browser...
+#  #> Press Esc/Ctrl + C to abort
+#  #> Authentication complete.
+#  
+#  
+#  # for subsequent sessions
+#  az <- get_azure_login()
+#  #> Loading Azure Resource Manager login for default tenant
+#  
+#  
+#  # you can also list the tenants that you've previously authenticated with
+#  list_azure_logins()
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  # all subscriptions associated with this app
+#  # authenticating with a custom service principal
+#  create_azure_login(tenant="myaadtenant", app="app_id", password="password")
+
+## ---- eval=FALSE---------------------------------------------------------
+#  # all subscriptions
 #  az$list_subscriptions()
-#  #$`5710aa44-281f-49fe-bfa6-69e66bb55b11`
-#  #<Azure subscription 5710aa44-281f-49fe-bfa6-69e66bb55b11>
-#  #  authorization_source: Legacy
-#  #  name: Visual Studio Ultimate with MSDN
-#  #  policies: list(locationPlacementId, quotaId, spendingLimit)
-#  #  state: Enabled
-#  #---
-#  #  Methods:
-#  #    create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,
-#  #    list_locations, list_resource_groups, list_resources
-#  #
-#  #$`e26f4a80-370f-4a77-88df-5a8d291cd2f9`
-#  #<Azure subscription e26f4a80-370f-4a77-88df-5a8d291cd2f9>
-#  #  authorization_source: RoleBased
-#  #  name: ADLTrainingMS
-#  #  policies: list(locationPlacementId, quotaId, spendingLimit)
-#  #  state: Enabled
-#  #---
-#  #  Methods:
-#  #    create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,
-#  #    list_locations, list_resource_groups, list_resources
-#  #
-#  #...
+#  #> $`5710aa44-281f-49fe-bfa6-69e66bb55b11`
+#  #> <Azure subscription 5710aa44-281f-49fe-bfa6-69e66bb55b11>
+#  #>   authorization_source: RoleBased
+#  #>   name: Visual Studio Ultimate with MSDN
+#  #>   policies: list(locationPlacementId, quotaId, spendingLimit)
+#  #>   state: Enabled
+#  #> ---
+#  #>   Methods:
+#  #>     create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,
+#  #>     list_locations, list_resource_groups, list_resources
+#  #>
+#  #> $`e26f4a80-370f-4a77-88df-5a8d291cd2f9`
+#  #> <Azure subscription e26f4a80-370f-4a77-88df-5a8d291cd2f9>
+#  #>   authorization_source: RoleBased
+#  #>   name: ADLTrainingMS
+#  #>   policies: list(locationPlacementId, quotaId, spendingLimit)
+#  #>   state: Enabled
+#  #> ---
+#  #>   Methods:
+#  #>     create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,
+#  #>     list_locations, list_resource_groups, list_resources
+#  #>
+#  #> ...
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  # get a subscription and resource group
+#  # get a subscription
 #  (sub1 <- az$get_subscription("5710aa44-281f-49fe-bfa6-69e66bb55b11"))
-#  #<Azure subscription 5710aa44-281f-49fe-bfa6-69e66bb55b11>
-#  #  authorization_source: Legacy
-#  #  name: Visual Studio Ultimate with MSDN
-#  #  policies: list(locationPlacementId, quotaId, spendingLimit)
-#  #  state: Enabled
-#  #---
-#  #  Methods:
-#  #    create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,
-#  #    list_locations, list_resource_groups, list_resources
+#  #> <Azure subscription 5710aa44-281f-49fe-bfa6-69e66bb55b11>
+#  #>   authorization_source: Legacy
+#  #>   name: Visual Studio Ultimate with MSDN
+#  #>   policies: list(locationPlacementId, quotaId, spendingLimit)
+#  #>   state: Enabled
+#  #> ---
+#  #>   Methods:
+#  #>     create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,
+#  #>     list_locations, list_resource_groups, list_resources
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  (rg <- sub1$get_resource_group("rdev1"))
-#  #<Azure resource group rdev1>
-#  #  id: /subscriptions/5710aa44-281f-49fe-bfa6-69e66bb55b11/resourceGroups/rdev1
-#  #  location: australiaeast
-#  #  managed_by: NULL
-#  #  properties: list(provisioningState)
-#  #  tags: NULL
-#  #---
-#  #  Methods:
-#  #    check, create_resource, delete, delete_resource, delete_template, deploy_template, get_resource,
-#  #    get_template, list_resources, list_templates
+#  #> <Azure resource group rdev1>
+#  #>   id: /subscriptions/5710aa44-281f-49fe-bfa6-69e66bb55b11/resourceGroups/rdev1
+#  #>   location: australiaeast
+#  #>   properties: list(provisioningState)
+#  #> ---
+#  #>   Methods:
+#  #>     check, create_resource, delete, delete_resource, delete_template, deploy_template, get_resource,
+#  #>     get_template, list_resources, list_templates
 #  
 #  # create and delete a resource group
 #  test <- sub1$create_resource_group("test_group")
@@ -71,21 +87,18 @@
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  (stor <- rg$get_resource(type="Microsoft.Storage/storageServices", name="rdevstor1"))
-#  #<Azure resource Microsoft.Storage/storageAccounts/rdevstor1>
-#  #  id: /subscriptions/5710aa44-281f-49fe-bfa6-69e66bb55b11/resourceGroups/rdev1/providers/Microsoft.Sto ...
-#  #  identity: NULL
-#  #  is_synced: TRUE
-#  #  kind: Storage
-#  #  location: australiasoutheast
-#  #  managed_by: NULL
-#  #  plan: NULL
-#  #  properties: list(networkAcls, trustedDirectories, supportsHttpsTrafficOnly, encryption,
-#  #    provisioningState, creationTime, primaryEndpoints, primaryLocation, statusOfPrimary)
-#  #  sku: list(name, tier)
-#  #  tags: list()
-#  #---
-#  #  Methods:
-#  #    check, delete, do_operation, set_api_version, sync_fields, update
+#  #> <Azure resource Microsoft.Storage/storageAccounts/rdevstor1>
+#  #>   id: /subscriptions/5710aa44-281f-49fe-bfa6-69e66bb55b11/resourceGroups/rdev1/providers/Microsoft.Sto ...
+#  #>   is_synced: TRUE
+#  #>   kind: Storage
+#  #>   location: australiasoutheast
+#  #>   properties: list(networkAcls, trustedDirectories, supportsHttpsTrafficOnly, encryption,
+#  #>     provisioningState, creationTime, primaryEndpoints, primaryLocation, statusOfPrimary)
+#  #>   sku: list(name, tier)
+#  #>   tags: list()
+#  #> ---
+#  #>   Methods:
+#  #>     check, delete, do_operation, set_api_version, sync_fields, update
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  # use method chaining to get a resource without creating a bunch of intermediaries
@@ -97,17 +110,17 @@
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  stor$do_operation("listKeys", http_verb="POST")
-#  # $`keys`
-#  # $`keys`[[1]]
-#  # $`keys`[[1]]$`keyName`
-#  # [1] "key1"
-#  #
-#  # $`keys`[[1]]$value
-#  # [1] "k0gGFi8LirKcDNe73fzwDzhZ2+4oRKzvz+6+Pfn2ZCKO/JLnpyBSpVO7btLxBXQj+j8MZatDTGZ2NXUItye/vA=="
-#  #
-#  # $`keys`[[1]]$permissions
-#  # [1] "FULL"
-#  #...
+#  #>  $`keys`
+#  #>  $`keys`[[1]]
+#  #>  $`keys`[[1]]$`keyName`
+#  #>  [1] "key1"
+#  #>
+#  #>  $`keys`[[1]]$value
+#  #>  [1] "k0gGFi8LirKcDNe73fzwDzhZ2+4oRKzvz+6+Pfn2ZCKO/JLnpyBSpVO7btLxBXQj+j8MZatDTGZ2NXUItye/vA=="
+#  #>
+#  #>  $`keys`[[1]]$permissions
+#  #>  [1] "FULL"
+#  #> ...
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  vm <- rg$get_resource(type="Microsoft.Compute/virtualMachines",

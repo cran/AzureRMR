@@ -5,11 +5,18 @@
 #' @docType class
 #' @section Methods:
 #' - `new(...)`: Initialize a new resource object. See 'Initialization' for more details.
-#' - `delete(..., confirm=TRUE, wait=FALSE)`: Delete this resource, after a confirmation check. Optionally wait for the delete to finish.
+#' - `delete(confirm=TRUE, wait=FALSE)`: Delete this resource, after a confirmation check. Optionally wait for the delete to finish.
 #' - `update(...)`: Update this resource on the host.
-#' - `sync_fields()`: Update the fields in this object with information from the host. Returns the `properties$provisioningState` field, so you can query this programmatically to check if a resource has finished provisioning. Not all resource types require explicit provisioning, in which case this method will return NULL.
-#' - `set_api_version(api_version)`: Set the API version to use when interacting with the host. By default, use the latest API version available.
-#' - `do_operation(...)` Carry out an operation. See 'Operations' for more details.
+#' - `sync_fields()`: Synchronise the R object with the resource it represents in Azure. Returns the `properties$provisioningState` field, so you can query this programmatically to check if a resource has finished provisioning. Not all resource types require explicit provisioning, in which case this method will return NULL.
+#' - `set_api_version(api_version, stable_only=TRUE)`: Set the API version to use when interacting with the host. If `api_version` is not supplied, use the latest version available, either the latest stable version (if `stable_only=TRUE`) or the latest preview version (if `stable_only=FALSE`).
+#' - `get_api_version()`: Get the current API version.
+#' - `do_operation(...)`: Carry out an operation. See 'Operations' for more details.
+#' - `set_tags(..., keep_existing=TRUE)`: Set the tags on this resource. The tags can be either names or name-value pairs. To delete a tag, set it to `NULL`.
+#' - `get_tags()`: Get the tags on this resource.
+#' - `create_lock(name, level)`: Create a management lock on this resource. The `level` argument can be either "cannotdelete" or "readonly". Note if you logged in via a custom service principal, it must have "Owner" or "User Access Administrator" access to manage locks.
+#' - `get_lock(name`): Returns a management lock object.
+#' - `delete_lock(name)`: Deletes a management lock object.
+#' - `list_locks()`: List all locks that apply to this resource. Note this includes locks created at the subscription or resource group level.
 #'
 #' @section Initialization:
 #' There are multiple ways to initialize a new resource object. The `new()` method can retrieve an existing resource, deploy/create a new resource, or create an empty/null object (without communicating with the host), based on the arguments you supply.
@@ -109,6 +116,7 @@ public=list(
     sku=NULL,
     tags=NULL,
     token=NULL,
+    etag=NULL,
 
     # constructor overloads:
     # 1. deploy resource: resgroup, {provider, path}|type, name, ...
@@ -117,7 +125,7 @@ public=list(
     # 4. get from host: resgroup, {provider, path}|type, name
     # 5. get from host by id: id
     initialize=function(token, subscription, resource_group, provider, path, type, name, id, ...,
-                        deployed_properties=list(), api_version=NULL)
+                        deployed_properties=list(), api_version=NULL, wait=FALSE)
     {
         self$token <- token
         self$subscription <- subscription
@@ -128,7 +136,7 @@ public=list(
         private$api_version <- api_version
 
         parms <- if(!is_empty(list(...)))
-            private$init_and_deploy(...)
+            private$init_and_deploy(..., wait=wait)
         else if(!is_empty(deployed_properties))
             private$init_from_parms(deployed_properties)
         else private$init_from_host()
@@ -141,19 +149,25 @@ public=list(
         self$properties <- parms$properties
         self$sku <- parms$sku
         self$tags <- parms$tags
+        self$etag <- parms$etag
 
         NULL
     },
 
-    # API versions vary across different providers; find the latest for this resource
-    set_api_version=function(api_version=NULL)
+    get_api_version=function()
+    {
+        private$api_version
+    },
+
+    set_api_version=function(api_version=NULL, stable_only=TRUE)
     {
         if(!is_empty(api_version))
         {
             private$api_version <- api_version
-            return()
+            return(invisible(api_version))
         }
 
+        # API versions vary across different providers; find the latest for this resource
         slash <- regexpr("/", self$type)
         provider <- substr(self$type, 1, slash - 1)
         path <- substr(self$type, slash + 1, nchar(self$type))
@@ -162,7 +176,13 @@ public=list(
         apis <- named_list(call_azure_rm(self$token, self$subscription, op)$resourceTypes, "resourceType")
 
         names(apis) <- tolower(names(apis))
-        private$api_version <- apis[[tolower(path)]]$apiVersions[[1]]
+        apis <- unlist(apis[[tolower(path)]]$apiVersions)
+        if(stable_only)
+            apis <- grep("preview", apis, value=TRUE, invert=TRUE)
+        if(is_empty(apis))
+            stop("No API versions found (try setting stable_only=FALSE)", call.=FALSE)
+
+        private$api_version <- apis[1]
         if(is_empty(private$api_version))
             stop("Unable to retrieve API version for resource '", self$type, "'.", call.=FALSE)
 
@@ -171,11 +191,11 @@ public=list(
 
     sync_fields=function()
     {
-        self$initialize(self$token, self$subscription, id=self$id)
+        self$initialize(self$token, self$subscription, id=self$id, api_version=private$api_version)
         self$properties$provisioningState
     },
 
-    delete=function(..., options=list(), confirm=TRUE, wait=FALSE)
+    delete=function(confirm=TRUE, wait=FALSE)
     {
         if(confirm && interactive())
         {
@@ -185,7 +205,7 @@ public=list(
         }
 
         message("Deleting resource '", construct_path(self$type, self$name), "'")
-        private$res_op(..., options=options, http_verb="DELETE")
+        private$res_op(http_verb="DELETE")
 
         if(wait)
         {
@@ -212,14 +232,21 @@ public=list(
     {
         parms <- list(...)
         private$validate_update_parms(names(parms))
-        private$res_op(body=parms, options=options, encode="json", http_verb="PATCH")
+        private$res_op(
+            body=jsonlite::toJSON(parms, auto_unbox=TRUE, digits=22),
+            options=options,
+            encode="raw",
+            http_verb="PATCH"
+        )
         self$sync_fields()
     },
 
     set_tags=function(..., keep_existing=TRUE)
     {
         tags <- match.call(expand.dots=FALSE)$...
-        unvalued <- names(tags) == ""
+        unvalued <- if(is.null(names(tags)))
+            rep(TRUE, length(tags))
+        else names(tags) == ""
 
         values <- lapply(seq_along(unvalued), function(i)
         {
@@ -230,15 +257,64 @@ public=list(
         if(keep_existing)
             values <- modifyList(self$tags, values)
 
-        if(is.null(values))
-            values <- list()
+        # delete tags specified to be null
+        values <- values[!sapply(values, is_empty)]
  
         self$update(tags=values)
+        invisible(NULL)
     },
 
     get_tags=function()
     {
         self$tags
+    },
+
+    create_lock=function(name, level=c("cannotdelete", "readonly"), notes="")
+    {
+        level <- match.arg(level)
+        api <- getOption("azure_api_mgmt_version")
+        op <- file.path("providers/Microsoft.Authorization/locks", name)
+        body <- list(properties=list(level=level))
+        if(notes != "")
+            body$notes <- notes
+
+        res <- self$do_operation(op, body=body, encode="json", http_verb="PUT", api_version=api)
+        az_resource$new(self$token, self$subscription, deployed_properties=res, api_version=api)
+    },
+
+    get_lock=function(name)
+    {
+        api <- getOption("azure_api_mgmt_version")
+        op <- file.path("providers/Microsoft.Authorization/locks", name)
+        res <- self$do_operation(op, api_version=api)
+        az_resource$new(self$token, self$subscription, deployed_properties=res, api_version=api)
+    },
+
+    delete_lock=function(name)
+    {
+        api <- getOption("azure_api_mgmt_version")
+        op <- file.path("providers/Microsoft.Authorization/locks", name)
+        self$do_operation(op, http_verb="DELETE", api_version=api)
+        invisible(NULL)
+    },
+
+    list_locks=function()
+    {
+        api <- getOption("azure_api_mgmt_version")
+        op <- "providers/Microsoft.Authorization/locks"
+        cont <- self$do_operation(op, api_version=api)
+
+        lst <- lapply(cont$value, function(parms)
+            az_resource$new(self$token, self$subscription, deployed_properties=parms, api_version=api))
+        # keep going until paging is complete
+        while(!is_empty(cont$nextLink))
+        {
+            cont <- call_azure_url(self$token, cont$nextLink)
+            lst <- c(lst, lapply(cont$value, function(parms)
+                az_resource$new(self$token, self$subscription, deployed_properties=parms, api_version=api)))
+        }
+        names(lst) <- sapply(lst, function(x) sub("^.+providers/(.+$)", "\\1", x$id))
+        lst
     },
 
     print=function(...)
@@ -247,7 +323,7 @@ public=list(
         cat("<Azure resource ", sub("^.+providers/(.+$)", "\\1", self$id), ">\n", sep="")
         cat(format_public_fields(self, exclude=c("subscription", "resource_group", "type", "name")))
         cat(format_public_methods(self))
-        invisible(NULL)
+        invisible(self)
     }
 ),
 
@@ -299,7 +375,7 @@ private=list(
         private$res_op()
     },
 
-    init_and_deploy=function(...)
+    init_and_deploy=function(..., wait)
     {
         properties <- list(...)
 
@@ -310,29 +386,57 @@ private=list(
         private$validate_deploy_parms(properties)
         private$res_op(body=properties, encode="json", http_verb="PUT")
 
-        # allow time for provisioning setup, then get properties
-        Sys.sleep(1)
-        private$res_op()
+        # do we wait until resource has finished provisioning?
+        if(wait)
+        {
+            message("Waiting for provisioning to complete")
+            for(i in 1:1000) # some resources can take a long time to provision (AKS, Kusto)
+            {
+                message(".", appendLF=FALSE)
+                Sys.sleep(5)
+
+                # some resources return from creation before they can be retrieved, let http 404's through
+                res <- private$res_op(http_status_handler="pass")
+
+                success <- httr::status_code(res) < 300 &&
+                    httr::content(res)$properties$provisioningState %in% c("Succeeded", "Error", "Failed")
+                if(success)
+                    break
+            }
+            if(success)
+                message("\nDeployment successful")
+            else stop("\nUnable to create resource", call.=FALSE)
+            httr::content(res)
+        }
+        else
+        {
+            # allow time for provisioning setup, then get properties
+            Sys.sleep(2)
+            private$res_op()
+        }
     },
 
     validate_deploy_parms=function(parms)
     {
         required_names <- character(0)
-        optional_names <- c("identity", "kind", "location", "managedBy", "plan", "properties", "sku", "tags")
+        optional_names <-
+            c("identity", "kind", "location", "managedBy", "plan", "properties", "sku", "tags", "etag")
         validate_object_names(names(parms), required_names, optional_names)
     },
 
     validate_response_parms=function(parms)
     {
-        required_names <- c("id", "name", "type", "location")
-        optional_names <- c("identity", "kind", "managedBy", "plan", "properties", "sku", "tags")
+        required_names <- c("id", "name", "type")
+        optional_names <-
+            c("identity", "kind", "location", "managedBy", "plan", "properties", "sku", "tags", "etag")
         validate_object_names(names(parms), required_names, optional_names)
     },
 
     validate_update_parms=function(parms)
     {
         required_names <- character(0)
-        optional_names <- c("identity", "kind", "location", "managedBy", "plan", "properties", "sku", "tags")
+        optional_names <-
+            c("identity", "kind", "location", "managedBy", "plan", "properties", "sku", "tags", "etag")
         validate_object_names(names(parms), required_names, optional_names)
     },
 

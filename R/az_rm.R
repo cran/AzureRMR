@@ -26,7 +26,8 @@
 #' - `token`: Optionally, an OAuth 2.0 token, of class [AzureToken]. This allows you to reuse the authentication details for an existing session. If supplied, all other arguments will be ignored.
 #'
 #' @seealso
-#' [create_azure_login], [get_azure_token], [AzureToken],
+#' [create_azure_login], [get_azure_login]
+#'
 #' [Azure Resource Manager overview](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview),
 #' [REST API reference](https://docs.microsoft.com/en-us/rest/api/resources/)
 #'
@@ -59,7 +60,7 @@ public=list(
     token=NULL,
 
     # authenticate and get subscriptions
-    initialize=function(tenant, app=.az_cli_app_id, password=NULL, username=NULL, auth_type=NULL,
+    initialize=function(tenant="common", app=.az_cli_app_id, password=NULL, username=NULL, auth_type=NULL,
                         host="https://management.azure.com/", aad_host="https://login.microsoftonline.com/",
                         config_file=NULL, token=NULL)
     {
@@ -67,7 +68,12 @@ public=list(
         {
             self$host <- if(token$version == 1)
                 token$resource
-            else token$scope
+            else
+            {
+                scope <- httr::parse_url(token$scope[1])
+                scope$path <- NULL
+                httr::build_url(scope)
+            }
             self$tenant <- token$tenant
             self$token <- token
             return(NULL)
@@ -80,6 +86,7 @@ public=list(
             if(!is.null(conf$app)) app <- conf$app
             if(!is.null(conf$auth_type)) auth_type <- conf$auth_type
             if(!is.null(conf$password)) password <- conf$password
+            if(!is.null(conf$username)) username <- conf$username
             if(!is.null(conf$host)) host <- conf$host
             if(!is.null(conf$aad_host)) aad_host <- conf$aad_host
         }
@@ -118,13 +125,8 @@ public=list(
     list_subscriptions=function()
     {
         cont <- call_azure_rm(self$token, subscription="", operation="")
-        lst <- lapply(cont$value, function(parms) az_subscription$new(self$token, parms=parms))
-        # keep going until paging is complete
-        while(!is_empty(cont$nextLink))
-        {
-            cont <- call_azure_url(self$token, cont$nextLink)
-            lst <- c(lst, lapply(cont$value, function(parms) az_subscription$new(self$token, parms=parms)))
-        }
+        lst <- lapply(get_paged_list(cont, self$token), function(parms)
+            az_subscription$new(self$token, parms=parms))
         named_list(lst, "id")
     },
 

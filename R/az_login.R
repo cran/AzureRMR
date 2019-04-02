@@ -70,6 +70,7 @@ create_azure_login <- function(tenant="common", app=.az_cli_app_id, password=NUL
         if(!is.null(conf$app)) app <- conf$app
         if(!is.null(conf$auth_type)) auth_type <- conf$auth_type
         if(!is.null(conf$password)) password <- conf$password
+        if(!is.null(conf$username)) username <- conf$username
         if(!is.null(conf$host)) host <- conf$host
         if(!is.null(conf$aad_host)) aad_host <- conf$aad_host
     }
@@ -123,7 +124,7 @@ get_azure_login <- function(tenant="common", selection=NULL, refresh=TRUE)
         stop(msg, call.=FALSE)
     }
 
-    if(length(this_login) == 1)
+    if(length(this_login) == 1 && is.null(selection))
         selection <- 1
     else if(is.null(selection))
     {
@@ -176,15 +177,8 @@ delete_azure_login <- function(tenant="common", confirm=TRUE)
 
     tenant <- normalize_tenant(tenant)
 
-    if(confirm && interactive())
-    {
-        msg <- paste0("Do you really want to delete the Azure Resource Manager login(s) for ",
-                      format_tenant(tenant), "? (y/N) ")
-
-        yn <- readline(msg)
-        if(tolower(substr(yn, 1, 1)) != "y")
-            return(invisible(NULL))
-    }
+    if(!delete_confirmed(confirm, format_tenant(tenant), "Azure Resource Manager login(s) for", FALSE))
+        return(invisible(NULL))
 
     arm_logins <- load_arm_logins()
     arm_logins[[tenant]] <- NULL

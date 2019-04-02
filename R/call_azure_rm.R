@@ -1,7 +1,7 @@
 #' Call the Azure Resource Manager REST API
 #'
 #' @param token An Azure OAuth token, of class [AzureToken].
-#' @param subscription A subscription ID.
+#' @param subscription For `call_azure_rm`, a subscription ID.
 #' @param operation The operation to perform, which will form part of the URL path.
 #' @param options A named list giving the URL query parameters.
 #' @param api_version The API version to use, which will form part of the URL sent to the host.
@@ -12,7 +12,7 @@
 #' @param ... Other arguments passed to lower-level code, ultimately to the appropriate functions in httr.
 #'
 #' @details
-#' These functions form the low-level interface between AzureRMR and Resource Manager. `call_azure_rm` builds a URL from its arguments and passes it to `call_azure_url`. Authentication is handled automatically.
+#' These functions form the low-level interface between R and Azure. `call_azure_rm` builds a URL from its arguments and passes it to `call_azure_url`. Authentication is handled automatically.
 #'
 #' @return
 #' If `http_status_handler` is one of `"stop"`, `"warn"` or `"message"`, the status code of the response is checked. If an error is not thrown, the parsed content of the response is returned with the status code attached as the "status" attribute.
@@ -43,10 +43,9 @@ call_azure_url <- function(token, url, ...,
                            auto_refresh=TRUE)
 {
     headers <- process_headers(token, ..., auto_refresh=auto_refresh)
-    verb <- get(match.arg(http_verb), getNamespace("httr"))
 
     # do actual API call
-    res <- verb(url, headers, ...)
+    res <- httr::VERB(match.arg(http_verb), url, headers, ...)
 
     process_response(res, match.arg(http_status_handler))
 }
@@ -61,9 +60,9 @@ process_headers <- function(token, ..., auto_refresh)
         token$refresh()
     }
 
+    host <- httr::parse_url(if(token$version == 1) token$resource else token$scope[1])$hostname
     creds <- token$credentials
-    host <- httr::parse_url(creds$resource)$host
-    headers <- c(Host=host, Authorization=paste(creds$token_type, creds$access_token))
+    headers <- c(Authorization=paste(creds$token_type, creds$access_token))
 
     # default content-type is json, set this if encoding not specified
     dots <- list(...)
@@ -78,10 +77,10 @@ process_response <- function(response, handler)
 {
     if(handler != "pass")
     {
-        handler <- get(paste0(handler, "_for_status"), getNamespace("httr"))
-        handler(response, paste0("complete Resource Manager operation. Message:\n",
-                                 sub("\\.$", "", arm_error_message(response))))
         cont <- httr::content(response)
+        handler <- get(paste0(handler, "_for_status"), getNamespace("httr"))
+        handler(response, paste0("complete operation. Message:\n",
+                                 sub("\\.$", "", error_message(cont))))
         if(is.null(cont))
             cont <- list()
         attr(cont, "status") <- httr::status_code(response)
@@ -92,17 +91,20 @@ process_response <- function(response, handler)
 
 
 # provide complete error messages from Resource Manager
-arm_error_message <- function(response)
+error_message <- function(cont)
 {
-    cont <- httr::content(response)
-
     # kiboze through possible message locations
     msg <- if(is.character(cont))
         cont
-    else if(is.list(cont) && is.character(cont$message))
-        cont$message
-    else if(is.list(cont) && is.list(cont$error) && is.character(cont$error$message))
-        cont$error$message
+    else if(is.list(cont))
+    {
+        if(is.character(cont$message))
+            cont$message
+        else if(is.list(cont$error) && is.character(cont$error$message))
+            cont$error$message
+        else if(is.list(cont$odata.error)) # OData
+            cont$odata.error$message$value
+    } 
     else ""
 
     paste0(strwrap(msg), collapse="\n")

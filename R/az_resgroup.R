@@ -18,10 +18,16 @@
 #' - `list_resources()`: Return a list of resource group objects for this subscription.
 #' - `set_tags(..., keep_existing=TRUE)`: Set the tags on this resource group. The tags can be either names or name-value pairs. To delete a tag, set it to `NULL`.
 #' - `get_tags()`: Get the tags on this resource.
-#' - `create_lock(name, level)`: Create a management lock on this resource group (which will propagate to all resources within it). The `level` argument can be either "cannotdelete" or "readonly". Note if you logged in via a custom service principal, it must have "Owner" or "User Access Administrator" access to manage locks.
+#' - `create_lock(name, level)`: Create a management lock on this resource group (which will propagate to all resources within it).
 #' - `get_lock(name`): Returns a management lock object.
 #' - `delete_lock(name)`: Deletes a management lock object.
 #' - `list_locks()`: List all locks that apply to this resource group. Note this includes locks created at the subscription level, and for any resources within the resource group.
+#' - `add_role_assignment(name, ...)`: Adds a new role assignment. See 'Role-based access control' below.
+#' - `get_role_assignment(id)`: Retrieves an existing role assignment.
+#' - `remove_role_assignment(id)`: Removes an existing role assignment.
+#' - `list_role_assignments()`: Lists role assignments.
+#' - `get_role_definition(id)`: Retrieves an existing role definition.
+#' - `list_role_definitions()` Lists role definitions.
 #'
 #' @section Initialization:
 #' Initializing a new object of this class can either retrieve an existing resource group, or create a new resource group on the host. Generally, the easiest way to create a resource group object is via the `get_resource_group`, `create_resource_group` or `list_resource_groups` methods of the [az_subscription] class, which handle this automatically.
@@ -53,11 +59,18 @@
 #'
 #' To create/deploy a new resource, specify any extra parameters that the provider needs as named arguments to `create_resource()`. Like `deploy_template()`, `create_resource()` also takes an optional `wait` argument that specifies whether to wait until resource creation is complete before returning.
 #'
+#' @section Role-based access control:
+#' AzureRMR implements a subset of the full RBAC functionality within Azure Active Directory. You can retrieve role definitions and add and remove role assignments, at the subscription, resource group and resource levels. See [rbac] for more information.
+#'
 #' @seealso
 #' [az_subscription], [az_template], [az_resource],
 #' [Azure resource group overview](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview#resource-groups),
 #' [Resources API reference](https://docs.microsoft.com/en-us/rest/api/resources/resources),
 #' [Template API reference](https://docs.microsoft.com/en-us/rest/api/resources/deployments)
+#'
+#' For role-based access control methods, see [rbac]
+#'
+#' For management locks, see [lock]
 #'
 #' @examples
 #' \dontrun{
@@ -137,12 +150,8 @@ public=list(
 
     delete=function(confirm=TRUE)
     {
-        if(confirm && interactive())
-        {
-            yn <- readline(paste0("Do you really want to delete resource group '", self$name, "'? (y/N) "))
-            if(tolower(substr(yn, 1, 1)) != "y")
-                return(invisible(NULL))
-        }
+        if(!delete_confirmed(confirm, self$name, "resource group"))
+            return(invisible(NULL))
 
         private$rg_op(http_verb="DELETE")
         message("Deleting resource group '", self$name, "'. This operation may take some time to complete.")
@@ -152,15 +161,9 @@ public=list(
     list_templates=function()
     {
         cont <- private$rg_op("providers/Microsoft.Resources/deployments")
-        lst <- lapply(cont$value,
-            function(parms) az_template$new(self$token, self$subscription, self$name, deployed_properties=parms))
-        # keep going until paging is complete
-        while(!is_empty(cont$nextLink))
-        {
-            cont <- call_azure_url(self$token, cont$nextLink)
-            lst <- c(lst, lapply(cont$value,
-                function(parms) az_template$new(self$token, self$subscription, self$name, deployed_properties=parms)))
-        }
+        lst <- lapply(get_paged_list(cont, self$token), function(parms)
+            az_template$new(self$token, self$subscription, self$name, deployed_properties=parms))
+
         named_list(lst)
     },
 
@@ -183,15 +186,9 @@ public=list(
     list_resources=function()
     {
         cont <- private$rg_op("resources")
-        lst <- lapply(cont$value, function(parms)
+        lst <- lapply(get_paged_list(cont, self$token), function(parms)
             az_resource$new(self$token, self$subscription, deployed_properties=parms))
-        # keep going until paging is complete
-        while(!is_empty(cont$nextLink))
-        {
-            cont <- call_azure_url(self$token, cont$nextLink)
-            lst <- c(lst, lapply(cont$value,
-                function(parms) az_resource$new(self$token, self$subscription, deployed_properties=parms)))
-        }
+
         names(lst) <- sapply(lst, function(x) sub("^.+providers/(.+$)", "\\1", x$id))
         lst
     },
@@ -266,54 +263,6 @@ public=list(
         if(is.null(self$tags))
             named_list()
         else self$tags
-    },
-
-    create_lock=function(name, level=c("cannotdelete", "readonly"), notes="")
-    {
-        level <- match.arg(level)
-        api <- getOption("azure_api_mgmt_version")
-        op <- file.path("providers/Microsoft.Authorization/locks", name)
-        body <- list(properties=list(level=level))
-        if(notes != "")
-            body$notes <- notes
-
-        res <- private$rg_op(op, body=body, encode="json", http_verb="PUT", api_version=api)
-        az_resource$new(self$token, self$subscription, deployed_properties=res, api_version=api)
-    },
-
-    get_lock=function(name)
-    {
-        api <- getOption("azure_api_mgmt_version")
-        op <- file.path("providers/Microsoft.Authorization/locks", name)
-        res <- private$rg_op(op, api_version=api)
-        az_resource$new(self$token, self$subscription, deployed_properties=res, api_version=api)
-    },
-
-    delete_lock=function(name)
-    {
-        api <- getOption("azure_api_mgmt_version")
-        op <- file.path("providers/Microsoft.Authorization/locks", name)
-        private$rg_op(op, http_verb="DELETE", api_version=api)
-        invisible(NULL)
-    },
-
-    list_locks=function()
-    {
-        api <- getOption("azure_api_mgmt_version")
-        op <- "providers/Microsoft.Authorization/locks"
-        cont <- private$rg_op(op, api_version=api)
-
-        lst <- lapply(cont$value, function(parms)
-            az_resource$new(self$token, self$subscription, deployed_properties=parms, api_version=api))
-        # keep going until paging is complete
-        while(!is_empty(cont$nextLink))
-        {
-            cont <- call_azure_url(self$token, cont$nextLink)
-            lst <- c(lst, lapply(cont$value, function(parms)
-                az_resource$new(self$token, self$subscription, deployed_properties=parms, api_version=api)))
-        }
-        names(lst) <- sapply(lst, function(x) sub("^.+providers/(.+$)", "\\1", x$id))
-        lst
     },
 
     print=function(...)

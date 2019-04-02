@@ -6,7 +6,7 @@
 #'
 #' @return
 #' A boolean.
-#' @rdname is
+#' @rdname info
 #' @export
 is_azure_login <- function(object)
 {
@@ -14,7 +14,7 @@ is_azure_login <- function(object)
 }
 
 
-#' @rdname is
+#' @rdname info
 #' @export
 is_subscription <- function(object)
 {
@@ -22,7 +22,7 @@ is_subscription <- function(object)
 }
 
 
-#' @rdname is
+#' @rdname info
 #' @export
 is_resource_group <- function(object)
 {
@@ -30,7 +30,7 @@ is_resource_group <- function(object)
 }
 
 
-#' @rdname is
+#' @rdname info
 #' @export
 is_resource <- function(object)
 {
@@ -38,10 +38,25 @@ is_resource <- function(object)
 }
 
 
-#' @rdname is
+#' @rdname info
 #' @export
 is_template <- function(object)
 {
     R6::is.R6(object) && inherits(object, "az_template")
 }
 
+
+#' @rdname info
+#' @export
+is_role_definition <- function(object)
+{
+    R6::is.R6(object) && inherits(object, "az_role_definition")
+}
+
+
+#' @rdname info
+#' @export
+is_role_assignment <- function(object)
+{
+    R6::is.R6(object) && inherits(object, "az_role_assignment")
+}

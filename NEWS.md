@@ -1,3 +1,8 @@
+# AzureRMR 2.1.1
+
+* Some refactoring of login code to better handle AzureAuth options. As part of this, the `config_file` argument for `az_rm$new` has been removed; to use a configuration file, call the (recommended) `create_azure_login` function.
+* `az_subscription$get_provider_api_version` now returns only stable APIs by default. Set the argument `stable_only=FALSE` to allow returning preview APIs.
+
 # AzureRMR 2.1.0
 
 * This version adds basic support for role-based access control (RBAC) at subscription, resource group and resource level. Add and remove role assignments, and retrieve role definitions. See `?rbac` for more information.

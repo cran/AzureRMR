@@ -1,3 +1,8 @@
+# AzureRMR 2.1.2
+
+- Fix a bug in template deployment where null fields were not handled correctly.
+- New `build_template_definition` and `build_parameters_parameters` generics to help in template deployment. These can take as inputs R lists, JSON text strings, or file connections, and can also be extended by other packages.
+
 # AzureRMR 2.1.1
 
 * Some refactoring of login code to better handle AzureAuth options. As part of this, the `config_file` argument for `az_rm$new` has been removed; to use a configuration file, call the (recommended) `create_azure_login` function.

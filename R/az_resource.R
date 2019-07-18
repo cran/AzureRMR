@@ -263,12 +263,12 @@ public=list(
         })
         names(values) <- ifelse(unvalued, as.character(tags), names(tags))
 
-        if(keep_existing)
+        if(keep_existing && !is_empty(self$tags))
             values <- modifyList(self$tags, values)
 
         # delete tags specified to be null
         values <- values[!sapply(values, is_empty)]
- 
+
         self$update(tags=values)
         invisible(NULL)
     },
@@ -358,10 +358,12 @@ private=list(
 
                 # some resources return from creation before they can be retrieved, let http 404's through
                 res <- private$res_op(http_status_handler="pass")
+                http_stat <- httr::status_code(res)
+                state <- httr::content(res)$properties$provisioningState
 
-                success <- httr::status_code(res) < 300 &&
-                    httr::content(res)$properties$provisioningState %in% c("Succeeded", "Error", "Failed")
-                if(success)
+                success <- http_stat < 300 && state == "Succeeded"
+                failure <- http_stat >= 300 || state %in% c("Error", "Failed")
+                if(success || failure)
                     break
             }
             if(success)

@@ -1,3 +1,11 @@
+# AzureRMR 2.3.0
+
+- New in this version is a facility for parallelising connections to Azure, using a pool of background processes. Some operations, such as downloading many small files or interacting with a cluster of VMs, can be sped up significantly by carrying them out in parallel rather than sequentially. The code for this is currently duplicated in multiple packages including AzureStor and AzureVM; putting it in AzureRMR removes the duplication and also makes it available to other packages that may benefit. See `?pool` for more details.
+- Expose `do_operation` methods for subscription and resource group objects, similar to that for resources. This allows arbitrary operations on a sub or RG.
+- AzureRMR now directly imports AzureGraph.
+- Update default Resource Manager API version to "2019-08-01".
+- Provide more informative error messages, especially when a template deployment fails.
+
 # AzureRMR 2.2.0
 
 - If the AzureGraph package is installed, `create_azure_login` can now create a login client for Microsoft Graph with the same credentials as the ARM client. This is to facilitate working with registered apps and service principals, eg when managing roles and permissions. Some Azure services also require creating service principals as part of creating a resource (eg Azure Kubernetes Service), and keeping the Graph credentials consistent with ARM helps ensure nothing breaks.

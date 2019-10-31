@@ -55,33 +55,6 @@ az <- get_azure_login()
 list_azure_logins()
 ```
 
-### Service principal
-
-Authenticating with Azure Active Directory requires providing an app or service principal ID. If you don't provide one, AzureRMR will authenticate using the Azure CLI cross-platform app. This is usually sufficient for most purposes, however if possible it's recommended that you create your own service principal to authenticate with. For example, if security is a concern, this lets you restrict the scope of the resources that AzureRMR that manipulate.
-
-Creating a service principal is a one-time task, and the easiest method is to use the Azure cloud shell.
-
-- In the Azure Portal (https://portal.azure.com/), click on the Cloud Shell icon:
-
-![](images/cloudportal2.png)
-
-- If you haven't used the shell before, there will be a dialog box to choose whether to use bash or PowerShell. Choose bash.
-- In the shell, type `az ad sp create-for-rbac --name {app-name} --subscription "{your-subscription-name}" --years {N}`, substituting the desired name of your service principal (try to make it memorable to you, and unlikely to clash with other names), your subscription name, and the number of years you want the password to be valid.
-- Wait until the app creation is complete. You should see a screen like this.
-
-![](images/cloudshell.png)
-
-- Record your app ID and password.
-
-If you want to allow access at something other than subscription level, you can use the `--scopes` argument in place of `--subscription`. For example, to restrict AzureRMR to only the "AnalyticsRG" resource group: `az ad sp create-for-rbac --scopes /subscriptions/{your-subscription-ID}/resourceGroups/AnalyticsRG`.
-
-Once you have created your own service principal, you can supply the app ID and password as arguments to `create_azure_login`. You'll also have to supply your Azure Active Directory tenant, as AAD does not have access to your personal credentials.
-
-```r
-# authenticating with a custom service principal
-create_azure_login(tenant="myaadtenant", app="app_id", password="password")
-```
-
 
 ## Subscriptions and resource groups
 
@@ -153,7 +126,7 @@ test$delete(confirm=FALSE)
 
 ## Resources and templates
 
-Methods for working with resources and templates are exposed as part of the `az_resource_group` class. You can retrieve an existing resource/template, create a new one, or delete an existing one.
+Methods for working with resources and templates are exposed as part of the `az_resource_group` class. You can retrieve an existing resource/template, create a new one, or delete an existing one. Below is a short introduction to resources; for templates, see the "Working with templates" vignette.
 
 ```r
 (stor <- rg$get_resource(type="Microsoft.Storage/storageServices", name="rdevstor1"))
@@ -227,26 +200,6 @@ stor$properties$primaryEndpoints$blob
 
 # OS profile for a VM: includes login details
 vm$properties$osProfile
-```
-
-
-In a manner similar to resources, deploying a [template](https://www.red-gate.com/simple-talk/cloud/infrastructure-as-a-service/azure-resource-manager-arm-templates/) is just a matter of calling the resource group object's `deploy_template` method. This takes two arguments, `template` and `parameters`. Both arguments should be in JSON format: either the name of a JSON file, a character vector containing the JSON data, or a list containing the parsed JSON (via `jsonlite::toJSON`).
-
-```r
-vm_tpl <- rg$deploy_template("myNewVirtualMachine",
-    template="vm_template.json",
-    parameters=list(
-        os="Linux",
-        size="Standard_DS2_v2",
-        username="ruser",
-        publickey=readLines("~/id_rsa.pub")
-    ))
-```
-
-Normally, deleting a template doesn't touch the resources it creates: it only deletes the template itself. However, AzureRMR optionally allows you to free any resources created when you delete a template. This is useful when managing complex objects like VMs, which actually consist of multiple individual resources in Azure (storage account, disk, network interface, etc). When you are done with the VM, deleting the template lets you free all these resources with a single command.
-
-```r
-vm_tpl$delete(free_resources=TRUE)
 ```
 
 

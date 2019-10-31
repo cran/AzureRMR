@@ -21,9 +21,9 @@
 #'
 #' If you also supply the following arguments to `new()`, a new template will be deployed:
 #' - `template`: The template to deploy. This can be provided in a number of ways:
-#'   1. A nested list of name-value pairs representing the parsed JSON
-#'   2. The name of a template file
-#'   3. A vector of strings containing unparsed JSON
+#'   1. A nested list of R objects, which will be converted to JSON via `jsonlite::toJSON`
+#'   2. A vector of strings containing unparsed JSON
+#'   3. The name of a template file
 #'   4. A URL from which the host can download the template
 #' - `parameters`: The parameters for the template. This can be provided using any of the same methods as the `template` argument.
 #' - `wait`: Optionally, whether to wait until the deployment is complete. Defaults to FALSE, in which case the method will return immediately.
@@ -246,7 +246,16 @@ private=list(
             }
             if(status == "Succeeded")
                 message("\nDeployment successful")
-            else stop("\nUnable to deploy template", call.=FALSE)
+            else
+            {
+                err_details <- parms$properties$error$details
+                if(is.list(err_details))
+                {
+                    msgs <- lapply(err_details, function(x) error_message(jsonlite::fromJSON(x$message)))
+                    stop("\nUnable to deploy template. Message:\n", do.call(paste0, msgs))
+                }
+                else stop("\nUnable to deploy template", call.=FALSE)
+            }
         }
         parms
     },

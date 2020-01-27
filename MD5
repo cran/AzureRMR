@@ -1,8 +1,8 @@
-1cc46efcfc5aa0f5a1af5a16f5f7612c *DESCRIPTION
+8567952f1e02ef2c7bcf1c66ad914b1d *DESCRIPTION
 fe7c703cf07e6f25fb657bab85bc2d2a *LICENSE
-45b2f11401047ecbe779b426b7b977f0 *NAMESPACE
-2650d0d5853e33cbe5a8234db7acc9fa *NEWS.md
-3b312c1d4b2f68eafaefd488488b426a *R/AzureRMR.R
+76c893339db9ee7494506c9586f5f8a3 *NAMESPACE
+4ca63fad69646d6f8e8afae4ab5b8f61 *NEWS.md
+335bfe8a5c2a1dc441e2410039c26c2b *R/AzureRMR.R
 e7db0625163c55df096ae70123c1ab28 *R/az_login.R
 548b332332935d28f4d7209e3aeeec12 *R/az_resgroup.R
 5b3edb1533801758c50d41df33225cf5 *R/az_resource.R
@@ -11,7 +11,7 @@ e7db0625163c55df096ae70123c1ab28 *R/az_login.R
 6ce186fcbc8ef3775b0792dc5496ca0f *R/az_subscription.R
 75349895236011e16ef808d21583c7f2 *R/az_template.R
 098205a0180156d9a46a27c095fb70cf *R/build_tpl_json.R
-1974676ee501c2dde2f1946ab895b952 *R/call_azure_rm.R
+268d7d61629e0abe3aef3562225190b7 *R/call_azure_rm.R
 ee842578b9c3f691303ac850c5741d0b *R/format.R
 639b7ee5f93a56a6fd6dd22fa2a1d22d *R/is.R
 8edff16de41108e3c1e2fa6dc85a0913 *R/locks.R
@@ -19,10 +19,10 @@ ee842578b9c3f691303ac850c5741d0b *R/format.R
 ca44a768e26f4a309b7bd0625ee8be87 *R/pool.R
 64b68289a262221a84f07380e24b5be6 *R/rbac.R
 35ffb1aebbb05a97301e10f4fbe5dee7 *R/reexport_AzureAuth.R
-37ed4fdd0ac41e44381b7b5237ffea2f *R/utils.R
+722755d05ccff42cbc4db5967a8116a3 *R/utils.R
 0faada619198e38c6122cc69bec26138 *README.md
 4b77f8a5c51d2674be4dda0304cd1159 *build/vignette.rds
-e2d163d29469cc0664c5a9a3593ce5b6 *inst/doc/extend.R
+7b33a4a85c8b08cc18377d8200362cf9 *inst/doc/extend.R
 ea4710b180598e385f85e9b57dc7c7ef *inst/doc/extend.Rmd
 1d8c15a1788ab16eab63b7aebf114dec *inst/doc/extend.html
 589daafb91c4b424851b26a40508f0a5 *inst/doc/intro.Rmd
@@ -50,7 +50,7 @@ c7254f3ef5df69e26cb3402ff6d75ac6 *man/format.Rd
 47f5d64a18411d4de4d0d9b12ad7dc58 *man/pool.Rd
 b5571463f8d52ac5f58cdc8a1e73b205 *man/rbac.Rd
 2e36a2746ec67e6a104eed84825bcdbd *man/reexports.Rd
-1ef87a9985833a8fb800177b22acb807 *man/utils.Rd
+f4c661b7bf549f79ca2db111c05f26cf *man/utils.Rd
 88187ee416e3620e15852811fe265a42 *tests/resources/parameter_values.json
 31ff5f28101f4b805d01b09ebc702173 *tests/resources/parameters.json
 a39049677043a2ada55461a9ced37ef0 *tests/resources/resources.json

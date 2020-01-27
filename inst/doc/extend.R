@@ -1,4 +1,4 @@
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  az_storage <- R6::R6Class("az_storage", inherit=AzureRMR::az_resource,
 #  
 #  public=list(
@@ -20,7 +20,7 @@
 #      }
 #  ))
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  az_vm_template <- R6::R6Class("az_vm_template", inherit=AzureRMR::az_template,
 #  
 #  public=list(
@@ -80,13 +80,13 @@
 #  )
 #  ))
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  res <- az_rm$new("tenant_id", "app_id", "secret") $
 #      get_subscription("subscription_id") $
 #      get_resource_group("resgroup") $
 #      get_my_resource("myresource")
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  
 #  # all methods adding methods to classes in external package must go in .onLoad
 #  .onLoad <- function(libname, pkgname)
@@ -118,7 +118,7 @@
 #      # ... other startup code ...
 #  }
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  .onLoad <- function(libname, pkgname)
 #  {
 #      AzureRMR::az_resource_group$set("public", "create_vm_cluster", overwrite=TRUE,
@@ -154,7 +154,7 @@
 #      # ... other startup code ...
 #  }
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  #' Get existing Azure resource type 'foo'
 #  #'
 #  #' Methods for the [AzureRMR::az_resource_group] and [AzureRMR::az_subscription] classes.
@@ -183,7 +183,7 @@
 #  #' [create_foo], [delete_foo], [az_foo]
 #  NULL
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  # blob endpoint for a storage account
 #  blob_endpoint <- function(endpoint, key=NULL, sas=NULL, api_version=getOption("azure_storage_api_version"))
 #  {

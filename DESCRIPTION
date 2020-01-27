@@ -1,6 +1,6 @@
 Package: AzureRMR
 Title: Interface to 'Azure Resource Manager'
-Version: 2.3.0
+Version: 2.3.1
 Authors@R: c(
     person("Hong", "Ooi", , "hongooi@microsoft.com", role = c("aut", "cre")),
     person("Microsoft", role="cph")
@@ -16,9 +16,9 @@ Imports: AzureGraph (>= 1.0.4), AzureAuth (>= 1.2.1), utils, parallel,
 Suggests: knitr, testthat, httpuv, AzureStor
 RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2019-10-28 19:04:14 UTC; hongo
+Packaged: 2020-01-26 22:28:36 UTC; hongo
 Author: Hong Ooi [aut, cre],
   Microsoft [cph]
 Maintainer: Hong Ooi <hongooi@microsoft.com>
 Repository: CRAN
-Date/Publication: 2019-10-31 10:30:06 UTC
+Date/Publication: 2020-01-27 06:30:33 UTC

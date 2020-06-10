@@ -1,3 +1,9 @@
+# AzureRMR 2.3.4
+
+- Add filtering arguments (`filter`, `expand` and `top`) for the `list_resource_groups`, `list_templates` and `list_resources` methods, to trim the results. See the Azure docs for more details.
+- Add `createdBy:AzureR/AzureRMR` tag to Azure objects (resource groups, resources and templates) created by this package.
+- Add a `get_tags()` method for templates.
+
 # AzureRMR 2.3.3
 
 - Allow for extra resource type-specific fields beyond those mentioned in the Resource Manager documentation. In particular, virtual machines and managed disks may have a `zones` field containing the availability zones.

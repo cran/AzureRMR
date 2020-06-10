@@ -72,6 +72,19 @@ test_that("Template methods work",
     tpl4 <- rg$deploy_template(tplname4, template=tpl_def,  parameters=par_def, wait=TRUE)
     tpl4$check()
     expect_is(tpl4, "az_template")
+
+    # tagging
+    expect_identical(tpl4$get_tags(), list(createdBy="AzureR/AzureRMR"))
+
+    # listing
+    tpllst0 <- rg$list_templates()
+    expect_true(is.list(tpllst0) && all(sapply(tpllst0, is_template)))
+
+    tpllst <- rg$list_templates(top=1)
+    expect_true(is.list(tpllst) && length(tpllst) == 1)
+
+    tpllst <- rg$list_templates(filter="provisioningState eq 'Succeeded'")
+    expect_true(is.list(tpllst) && length(tpllst) > 0)
 })
 
 rg$delete(confirm=FALSE)

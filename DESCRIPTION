@@ -1,8 +1,8 @@
 Package: AzureRMR
 Title: Interface to 'Azure Resource Manager'
-Version: 2.3.5
+Version: 2.3.6
 Authors@R: c(
-    person("Hong", "Ooi", , "hongooi@microsoft.com", role = c("aut", "cre")),
+    person("Hong", "Ooi", , "hongooi73@gmail.com", role = c("aut", "cre")),
     person("Microsoft", role="cph")
     )
 Description: A lightweight but powerful R interface to the 'Azure Resource Manager' REST API. The package exposes a comprehensive class framework and related tools for creating, updating and deleting 'Azure' resource groups, resources and templates. While 'AzureRMR' can be used to manage any 'Azure' service, it can also be extended by other packages to provide extra functionality for specific services. Part of the 'AzureR' family of packages.
@@ -16,9 +16,9 @@ Imports: AzureGraph (>= 1.0.4), AzureAuth (>= 1.2.1), utils, parallel,
 Suggests: knitr, rmarkdown, testthat, httpuv, AzureStor
 RoxygenNote: 7.1.1
 NeedsCompilation: no
-Packaged: 2020-07-26 18:47:38 UTC; hongo
+Packaged: 2020-10-13 14:10:55 UTC; hongo
 Author: Hong Ooi [aut, cre],
   Microsoft [cph]
-Maintainer: Hong Ooi <hongooi@microsoft.com>
+Maintainer: Hong Ooi <hongooi73@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-07-26 19:12:07 UTC
+Date/Publication: 2020-10-14 05:30:17 UTC

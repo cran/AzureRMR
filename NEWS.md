@@ -1,3 +1,8 @@
+# AzureRMR 2.4.1
+
+- Fix the `set_tags` method to work when called inside a function (#18).
+- `get_resource(*, api_version=NULL)` when there are no stable API versions will now warn and use the latest preview version, rather than throw an error (#19).
+
 # AzureRMR 2.4.0
 
 - Some utility functions moved to AzureGraph package. These are imported and then reexported by AzureRMR so that existing code should work unchanged.

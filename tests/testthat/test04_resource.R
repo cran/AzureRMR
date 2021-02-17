@@ -17,13 +17,13 @@ rg <- az_rm$
 
 test_that("Resource methods work",
 {
-    expect_false(rg$resource_exists(type="foo/bar", name="randomname"))
-    expect_false(rg$resource_exists(type=restype, name=resname))
+    expect_false(rg$resource_exists(type="Microsoft.Storage/storageAccounts", name="randomname"))
 
     # public key resource (no wait required)
     restype <- "Microsoft.Compute/sshPublicKeys"
     resname <- paste(sample(letters, 20, replace=TRUE), collapse="")
 
+    expect_false(rg$resource_exists(type=restype, name=resname))
     res <- rg$create_resource(type=restype, name=resname)
 
     expect_true(rg$resource_exists(type=restype, name=resname))
@@ -115,6 +115,30 @@ test_that("List filters work",
     expect_true(is.list(reslst))
     expect_true(all(sapply(reslst,
         function(r) is_resource(r) && r$type == "Microsoft.Storage/storageAccounts" && !is_empty(r$ext$createdTime))))
+})
+
+test_that("Tag creation inside a function works",
+{
+    reslst <- rg$list_resources()
+    expect_true(length(reslst) > 0)
+
+    res <- reslst[[1]]
+    expect_is(res, "az_resource")
+
+    func <- function(obj, value)
+    {
+        obj$set_tags(test_tag=value)
+    }
+    expect_silent(func(res, "test value"))
+    tags <- res$get_tags()
+    expect_true("test_tag" %in% names(tags) && "test value" == tags$test_tag)
+})
+
+test_that("Getting a resource with only preview API version works",
+{
+    type <- "Microsoft.sqlvirtualmachine/sqlvirtualmachines"
+    name <- "nonexistent"
+    expect_error(expect_warning(rg$get_resource(type=type, name=name), "No stable API versions found"))
 })
 
 test_that("Resource deletion works",

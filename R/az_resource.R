@@ -206,20 +206,12 @@ public=list(
         provider <- substr(self$type, 1, slash - 1)
         path <- substr(self$type, slash + 1, nchar(self$type))
 
-        op <- construct_path("providers", provider)
-        apis <- named_list(call_azure_rm(self$token, self$subscription, op)$resourceTypes, "resourceType")
+        temp_sub <- az_subscription$new(self$token, self$subscription, list(NULL))
+        ver <- temp_sub$get_provider_api_version(provider, path, stable_only=stable_only)
+        if(ver == "")
+            stop("No API versions found (try setting stable_only=FALSE")
 
-        names(apis) <- tolower(names(apis))
-        apis <- unlist(apis[[tolower(path)]]$apiVersions)
-        if(stable_only)
-            apis <- grep("preview", apis, value=TRUE, invert=TRUE)
-        if(is_empty(apis))
-            stop("No API versions found (try setting stable_only=FALSE)", call.=FALSE)
-
-        private$api_version <- apis[1]
-        if(is_empty(private$api_version))
-            stop("Unable to retrieve API version for resource '", self$type, "'.", call.=FALSE)
-
+        private$api_version <- ver
         invisible(private$api_version)
     },
 
@@ -307,7 +299,7 @@ public=list(
 
         values <- lapply(seq_along(unvalued), function(i)
         {
-            if(unvalued[i]) "" else as.character(eval.parent(tags[[i]]))
+            if(unvalued[i]) "" else as.character(eval(tags[[i]], parent.frame(3)))
         })
         names(values) <- ifelse(unvalued, as.character(tags), names(tags))
 
@@ -461,7 +453,16 @@ private=list(
     {
         # make sure we have an API to call
         if(is.null(private$api_version))
-            self$set_api_version()
+        {
+            res <- try(self$set_api_version(), silent=TRUE)
+            if(inherits(res, "try-error"))
+            {
+                warning("No stable API versions found, falling back to the latest preview version", call.=FALSE)
+                res <- try(self$set_api_version(stable_only=FALSE), silent=TRUE)
+            }
+            if(inherits(res, "try-error"))
+                stop("No API versions found", call.=FALSE)
+        }
 
         op <- construct_path("resourcegroups", self$resource_group, "providers", self$type, self$name, op)
         call_azure_rm(self$token, self$subscription, op, ..., api_version=api_version)

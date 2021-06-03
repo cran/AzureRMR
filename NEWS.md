@@ -1,3 +1,9 @@
+# AzureRMR 2.4.2
+
+- Replace the old "Service principal" vignette with an "Authentication basics" vignette, which provides more information on common authentication flows.
+- Update Resource Manager API version to "2021-04-01".
+  - Also update `az_subscription$list_locations` to handle the new response format.
+
 # AzureRMR 2.4.1
 
 - Fix the `set_tags` method to work when called inside a function (#18).

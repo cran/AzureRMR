@@ -1,9 +1,9 @@
-8b117773d0ed36c951e555f503c32858 *DESCRIPTION
+07bbb3830f94a2e9df1ae68c309b9dba *DESCRIPTION
 aa8a33ce0e0e707910be086ab9fdd318 *LICENSE
 69d6871bacea09d45ac7fb32d765ca39 *NAMESPACE
-858f6d37fdb9d82a9508e9ffc1b2eb0b *NEWS.md
+236ea184960db33e42685d3347aac701 *NEWS.md
 0f5ec2ad54c404484889190aebc089fb *R/AzureRMR.R
-95ed086a435e21095e442dede2664c88 *R/az_login.R
+d6aabb463c1dcbf029b5dae4fb20c5be *R/az_login.R
 4b96b32319455960aba460b3ad315803 *R/az_resgroup.R
 94bd192e85541810386350585c056549 *R/az_resource.R
 d936ab0e7fd06e9e3467b73a7445f931 *R/az_rm.R
@@ -20,7 +20,7 @@ ca44a768e26f4a309b7bd0625ee8be87 *R/pool.R
 35ffb1aebbb05a97301e10f4fbe5dee7 *R/reexport_AzureAuth.R
 383b742335633f5e8f46f55470f9e438 *R/utils.R
 7c3c7a25c0df404001f6a4f6275fedcb *README.md
-c57b95c1561b1b9c7717bbb7ff291082 *build/vignette.rds
+f164d0e8bb5f3e85070da4a9b13a672a *build/vignette.rds
 be0e2abe97cc4138f271e9e99d7f8f51 *inst/doc/auth.Rmd
 85367b97fcbaa37aab4ff223dfc27b84 *inst/doc/auth.html
 7b33a4a85c8b08cc18377d8200362cf9 *inst/doc/extend.R
@@ -37,9 +37,9 @@ c2cc9e3ed956539112ef3e7badc90cee *man/az_resource_group.Rd
 c020db08029d576cfc96bfcdf868d2c8 *man/az_rm.Rd
 e94860b82f9e2a04440391c9254b2290 *man/az_role_assignment.Rd
 222a71aad5466854f7dd473fb6124551 *man/az_role_definition.Rd
-cfba6f9111d6dc89f66599db0a9f82f2 *man/az_subscription.Rd
+869cf78c53dd88bc3af512464f6d2b69 *man/az_subscription.Rd
 b56a8016689c5ed7272f6e89c27d6a54 *man/az_template.Rd
-1b2a9f0081edbed04a2a0a0608b9e9f9 *man/azure_login.Rd
+131e4fc4d4cf95db4eccca6c0cf655f8 *man/azure_login.Rd
 6a6677d5b783393bce6f18e48a2e7af2 *man/build_template.Rd
 da657c763b6315cb6616680c994c8541 *man/call_azure.Rd
 ac6ee4f7254371b56cbd2793218c23a3 *man/figures/logo.png

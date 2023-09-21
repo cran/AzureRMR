@@ -15,74 +15,103 @@
 
 <title>Parallel connections using a background process pool</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -91,13 +120,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -105,6 +141,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -300,56 +337,94 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Parallel connections using a background process pool</h1>
+<h1 class="title toc-ignore">Parallel connections using a background
+process pool</h1>
 <h4 class="author">Hong Ooi</h4>
 
 
 
-<p>AzureRMR provides the ability to parallelise communicating with Azure by utilising a pool of R processes in the background. This often leads to major speedups in scenarios like downloading large numbers of small files, or working with a cluster of virtual machines. This is intended for use by packages that extend AzureRMR (and was originally implemented as part of the AzureStor package), but can also be called directly by the end-user.</p>
-<p>This functionality was originally implemented independently in the AzureStor and AzureVM packages, but has now been moved into AzureRMR. This removes the code duplication, and also makes it available for other packages that may benefit.</p>
+<p>AzureRMR provides the ability to parallelise communicating with Azure
+by utilising a pool of R processes in the background. This often leads
+to major speedups in scenarios like downloading large numbers of small
+files, or working with a cluster of virtual machines. This is intended
+for use by packages that extend AzureRMR (and was originally implemented
+as part of the AzureStor package), but can also be called directly by
+the end-user.</p>
+<p>This functionality was originally implemented independently in the
+AzureStor and AzureVM packages, but has now been moved into AzureRMR.
+This removes the code duplication, and also makes it available for other
+packages that may benefit.</p>
 <div id="working-with-the-pool" class="section level2">
 <h2>Working with the pool</h2>
-<p>A small API consisting of the following functions is currently provided for managing the pool. They pass their arguments down to the corresponding functions in the parallel package.</p>
+<p>A small API consisting of the following functions is currently
+provided for managing the pool. They pass their arguments down to the
+corresponding functions in the parallel package.</p>
 <ul>
-<li><code>init_pool</code> initialises the pool, creating it if necessary. The pool is created by calling <code>parallel::makeCluster</code> with the pool size and any additional arguments. If <code>init_pool</code> is called and the current pool is smaller than <code>size</code>, it is resized.</li>
-<li><code>delete_pool</code> shuts down the background processes and deletes the pool.</li>
-<li><code>pool_exists</code> checks for the existence of the pool, returning a TRUE/FALSE value.</li>
-<li><code>pool_size</code> returns the size of the pool, or zero if the pool does not exist.</li>
-<li><code>pool_export</code> exports variables to the pool nodes. It calls <code>parallel::clusterExport</code> with the given arguments.</li>
-<li><code>pool_lapply</code>, <code>pool_sapply</code> and <code>pool_map</code> carry out work on the pool. They call <code>parallel::parLapply</code>, <code>parallel::parSapply</code> and <code>parallel::clusterMap</code> with the given arguments.</li>
-<li><code>pool_call</code> and <code>pool_evalq</code> execute code on the pool nodes. They call <code>parallel::clusterCall</code> and <code>parallel::clusterEvalQ</code> with the given arguments.</li>
+<li><code>init_pool</code> initialises the pool, creating it if
+necessary. The pool is created by calling
+<code>parallel::makeCluster</code> with the pool size and any additional
+arguments. If <code>init_pool</code> is called and the current pool is
+smaller than <code>size</code>, it is resized.</li>
+<li><code>delete_pool</code> shuts down the background processes and
+deletes the pool.</li>
+<li><code>pool_exists</code> checks for the existence of the pool,
+returning a TRUE/FALSE value.</li>
+<li><code>pool_size</code> returns the size of the pool, or zero if the
+pool does not exist.</li>
+<li><code>pool_export</code> exports variables to the pool nodes. It
+calls <code>parallel::clusterExport</code> with the given
+arguments.</li>
+<li><code>pool_lapply</code>, <code>pool_sapply</code> and
+<code>pool_map</code> carry out work on the pool. They call
+<code>parallel::parLapply</code>, <code>parallel::parSapply</code> and
+<code>parallel::clusterMap</code> with the given arguments.</li>
+<li><code>pool_call</code> and <code>pool_evalq</code> execute code on
+the pool nodes. They call <code>parallel::clusterCall</code> and
+<code>parallel::clusterEvalQ</code> with the given arguments.</li>
 </ul>
-<p>The pool is persistent for the session or until terminated by <code>delete_pool</code>. You should initialise the pool by calling <code>init_pool</code> before running any code on it. This restores the original state of the pool nodes by removing any objects that may be in memory, and resetting the working directory to the master working directory.</p>
-<p>The pool is a shared resource, and so packages that make use of it should not assume that they have sole control over its state. In particular, just because the pool exists at the end of one call doesn’t mean it will still exist at the time of a subsequent call.</p>
-<p>Here is a simple example that shows how to initialise the pool, and then execute code on it.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># create the pool</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="co"># by default, it contains 10 nodes</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">init_pool</span>()</span>
-<span id="cb1-4"><a href="#cb1-4"></a></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="co"># send some data to the nodes</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a>x &lt;-<span class="st"> </span><span class="dv">42</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a><span class="kw">pool_export</span>(<span class="st">&quot;x&quot;</span>)</span>
-<span id="cb1-8"><a href="#cb1-8"></a></span>
-<span id="cb1-9"><a href="#cb1-9"></a><span class="co"># run some code</span></span>
-<span id="cb1-10"><a href="#cb1-10"></a><span class="kw">pool_sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="cf">function</span>(y) x <span class="op">+</span><span class="st"> </span>y)</span>
-<span id="cb1-11"><a href="#cb1-11"></a></span>
-<span id="cb1-12"><a href="#cb1-12"></a><span class="co">#&gt; [1] 43 44 45 46 47 48 49 50 51 52</span></span></code></pre></div>
-<p>Here is a more realistic example using the AzureStor package. We create a connection to an Azure storage account, and then upload a number of files in parallel to a blob container. This is basically what the <code>storage_multiupload</code> function does under the hood.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">init_pool</span>()</span>
-<span id="cb2-2"><a href="#cb2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">library</span>(AzureStor)</span>
-<span id="cb2-4"><a href="#cb2-4"></a>endp &lt;-<span class="st"> </span><span class="kw">storage_endpoint</span>(<span class="st">&quot;https://mystorageacct.blob.core.windows.net&quot;</span>, <span class="dt">key=</span><span class="st">&quot;key&quot;</span>)</span>
-<span id="cb2-5"><a href="#cb2-5"></a>cont &lt;-<span class="st"> </span><span class="kw">storage_container</span>(endp, <span class="st">&quot;container&quot;</span>)</span>
-<span id="cb2-6"><a href="#cb2-6"></a></span>
-<span id="cb2-7"><a href="#cb2-7"></a>src_files &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;file1.txt&quot;</span>, <span class="st">&quot;file2.txt&quot;</span>, <span class="st">&quot;file3.txt&quot;</span>)</span>
-<span id="cb2-8"><a href="#cb2-8"></a>dest_files &lt;-<span class="st"> </span>src_files</span>
-<span id="cb2-9"><a href="#cb2-9"></a></span>
-<span id="cb2-10"><a href="#cb2-10"></a><span class="kw">pool_export</span>(<span class="st">&quot;cont&quot;</span>)</span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="kw">pool_map</span>(</span>
-<span id="cb2-12"><a href="#cb2-12"></a>    <span class="cf">function</span>(src, dest) AzureStor<span class="op">::</span><span class="kw">storage_upload</span>(cont, src, dest),</span>
-<span id="cb2-13"><a href="#cb2-13"></a>    <span class="dt">src=</span>src_files,</span>
-<span id="cb2-14"><a href="#cb2-14"></a>    <span class="dt">dest=</span>dest_files</span>
-<span id="cb2-15"><a href="#cb2-15"></a>)</span></code></pre></div>
+<p>The pool is persistent for the session or until terminated by
+<code>delete_pool</code>. You should initialise the pool by calling
+<code>init_pool</code> before running any code on it. This restores the
+original state of the pool nodes by removing any objects that may be in
+memory, and resetting the working directory to the master working
+directory.</p>
+<p>The pool is a shared resource, and so packages that make use of it
+should not assume that they have sole control over its state. In
+particular, just because the pool exists at the end of one call doesn’t
+mean it will still exist at the time of a subsequent call.</p>
+<p>Here is a simple example that shows how to initialise the pool, and
+then execute code on it.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># create the pool</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># by default, it contains 10 nodes</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">init_pool</span>()</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co"># send some data to the nodes</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">42</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="fu">pool_export</span>(<span class="st">&quot;x&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co"># run some code</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">pool_sapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="cf">function</span>(y) x <span class="sc">+</span> y)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; [1] 43 44 45 46 47 48 49 50 51 52</span></span></code></pre></div>
+<p>Here is a more realistic example using the AzureStor package. We
+create a connection to an Azure storage account, and then upload a
+number of files in parallel to a blob container. This is basically what
+the <code>storage_multiupload</code> function does under the hood.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">init_pool</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">library</span>(AzureStor)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>endp <span class="ot">&lt;-</span> <span class="fu">storage_endpoint</span>(<span class="st">&quot;https://mystorageacct.blob.core.windows.net&quot;</span>, <span class="at">key=</span><span class="st">&quot;key&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>cont <span class="ot">&lt;-</span> <span class="fu">storage_container</span>(endp, <span class="st">&quot;container&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>src_files <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;file1.txt&quot;</span>, <span class="st">&quot;file2.txt&quot;</span>, <span class="st">&quot;file3.txt&quot;</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>dest_files <span class="ot">&lt;-</span> src_files</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">pool_export</span>(<span class="st">&quot;cont&quot;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">pool_map</span>(</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>    <span class="cf">function</span>(src, dest) AzureStor<span class="sc">::</span><span class="fu">storage_upload</span>(cont, src, dest),</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>    <span class="at">src=</span>src_files,</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>    <span class="at">dest=</span>dest_files</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 
 

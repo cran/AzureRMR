@@ -14,74 +14,103 @@
 
 <title>Extending AzureRMR</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -90,13 +119,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -104,6 +140,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -303,244 +340,312 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<p>AzureRMR provides a generic framework for managing Azure resources. While you can use it as provided to work with any Azure service, you may also want to extend it to provide more features for a particular service. This vignette describes the process of doing so.</p>
-<p>We’ll use examples from some of the other AzureR packages to show how this works.</p>
+<p>AzureRMR provides a generic framework for managing Azure resources.
+While you can use it as provided to work with any Azure service, you may
+also want to extend it to provide more features for a particular
+service. This vignette describes the process of doing so.</p>
+<p>We’ll use examples from some of the other AzureR packages to show how
+this works.</p>
 <div id="subclass-resourcetemplate-classes" class="section level2">
 <h2>Subclass resource/template classes</h2>
-<p>Create subclasses of <code>az_resource</code> and/or <code>az_template</code> to represent the resources used by this service. For example, the AzureStor package provides a new class, <code>az_storage</code>, that inherits from <code>az_resource</code>. This class represents a storage accounts and has new methods specific to storage, such as listing access keys, generating a shared access signature (SAS), and creating a client endpoint object. Here is a simplified version of the <code>az_storage</code> class.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>az_storage &lt;-<span class="st"> </span>R6<span class="op">::</span><span class="kw">R6Class</span>(<span class="st">&quot;az_storage&quot;</span>, <span class="dt">inherit=</span>AzureRMR<span class="op">::</span>az_resource,</span>
-<span id="cb1-2"><a href="#cb1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="dt">public=</span><span class="kw">list</span>(</span>
-<span id="cb1-4"><a href="#cb1-4"></a></span>
-<span id="cb1-5"><a href="#cb1-5"></a>    <span class="dt">list_keys=</span><span class="cf">function</span>()</span>
-<span id="cb1-6"><a href="#cb1-6"></a>    {</span>
-<span id="cb1-7"><a href="#cb1-7"></a>        keys &lt;-<span class="st"> </span><span class="kw">named_list</span>(private<span class="op">$</span><span class="kw">res_op</span>(<span class="st">&quot;listKeys&quot;</span>, <span class="dt">http_verb=</span><span class="st">&quot;POST&quot;</span>)<span class="op">$</span>keys, <span class="st">&quot;keyName&quot;</span>)</span>
-<span id="cb1-8"><a href="#cb1-8"></a>        <span class="kw">sapply</span>(keys, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">&quot;value&quot;</span>)</span>
-<span id="cb1-9"><a href="#cb1-9"></a>    },</span>
-<span id="cb1-10"><a href="#cb1-10"></a></span>
-<span id="cb1-11"><a href="#cb1-11"></a>    <span class="dt">get_blob_endpoint=</span><span class="cf">function</span>(<span class="dt">key=</span>self<span class="op">$</span><span class="kw">list_keys</span>()[<span class="dv">1</span>], <span class="dt">sas=</span><span class="ot">NULL</span>)</span>
-<span id="cb1-12"><a href="#cb1-12"></a>    {</span>
-<span id="cb1-13"><a href="#cb1-13"></a>        <span class="kw">blob_endpoint</span>(self<span class="op">$</span>properties<span class="op">$</span>primaryEndpoints<span class="op">$</span>blob, <span class="dt">key=</span>key, <span class="dt">sas=</span>sas)</span>
-<span id="cb1-14"><a href="#cb1-14"></a>    },</span>
-<span id="cb1-15"><a href="#cb1-15"></a></span>
-<span id="cb1-16"><a href="#cb1-16"></a>    <span class="dt">get_file_endpoint=</span><span class="cf">function</span>(<span class="dt">key=</span>self<span class="op">$</span><span class="kw">list_keys</span>()[<span class="dv">1</span>], <span class="dt">sas=</span><span class="ot">NULL</span>)</span>
-<span id="cb1-17"><a href="#cb1-17"></a>    {</span>
-<span id="cb1-18"><a href="#cb1-18"></a>        <span class="kw">file_endpoint</span>(self<span class="op">$</span>properties<span class="op">$</span>primaryEndpoints<span class="op">$</span>file, <span class="dt">key=</span>key, <span class="dt">sas=</span>sas)</span>
-<span id="cb1-19"><a href="#cb1-19"></a>    }</span>
-<span id="cb1-20"><a href="#cb1-20"></a>))</span></code></pre></div>
-<p>In most cases, you can rely on the default <code>az_resource$initialize</code> method to handle object construction. You can override this method if your resource class contains new data fields that have to be initialised.</p>
-<p>A more complex example of a custom class is the <code>az_vm_template</code> class in the AzureVM package. This represents the resources used by a virtual machine, or cluster of virtual machines, in Azure. The initialisation code not only handles the details of deploying or getting the template used to create the VM(s), but also retrieves the individual resource objects themselves.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>az_vm_template &lt;-<span class="st"> </span>R6<span class="op">::</span><span class="kw">R6Class</span>(<span class="st">&quot;az_vm_template&quot;</span>, <span class="dt">inherit=</span>AzureRMR<span class="op">::</span>az_template,</span>
-<span id="cb2-2"><a href="#cb2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="dt">public=</span><span class="kw">list</span>(</span>
-<span id="cb2-4"><a href="#cb2-4"></a>    <span class="dt">disks=</span><span class="ot">NULL</span>,</span>
-<span id="cb2-5"><a href="#cb2-5"></a>    <span class="dt">status=</span><span class="ot">NULL</span>,</span>
-<span id="cb2-6"><a href="#cb2-6"></a>    <span class="dt">ip_address=</span><span class="ot">NULL</span>,</span>
-<span id="cb2-7"><a href="#cb2-7"></a>    <span class="dt">dns_name=</span><span class="ot">NULL</span>,</span>
-<span id="cb2-8"><a href="#cb2-8"></a>    <span class="dt">clust_size=</span><span class="ot">NULL</span>,</span>
-<span id="cb2-9"><a href="#cb2-9"></a></span>
-<span id="cb2-10"><a href="#cb2-10"></a>    <span class="dt">initialize=</span><span class="cf">function</span>(token, subscription, resource_group, name, ...)</span>
-<span id="cb2-11"><a href="#cb2-11"></a>    {</span>
-<span id="cb2-12"><a href="#cb2-12"></a>        super<span class="op">$</span><span class="kw">initialize</span>(token, subscription, resource_group, name, ...)</span>
-<span id="cb2-13"><a href="#cb2-13"></a></span>
-<span id="cb2-14"><a href="#cb2-14"></a>        <span class="co"># fill in fields that don&#39;t require querying the host</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a>        num_instances &lt;-<span class="st"> </span>self<span class="op">$</span>properties<span class="op">$</span>outputs<span class="op">$</span>numInstances</span>
-<span id="cb2-16"><a href="#cb2-16"></a>        <span class="cf">if</span>(<span class="kw">is_empty</span>(num_instances))</span>
-<span id="cb2-17"><a href="#cb2-17"></a>        {</span>
-<span id="cb2-18"><a href="#cb2-18"></a>            self<span class="op">$</span>clust_size &lt;-<span class="st"> </span><span class="dv">1</span></span>
-<span id="cb2-19"><a href="#cb2-19"></a>            vmnames &lt;-<span class="st"> </span>self<span class="op">$</span>name</span>
-<span id="cb2-20"><a href="#cb2-20"></a>        }</span>
-<span id="cb2-21"><a href="#cb2-21"></a>        <span class="cf">else</span></span>
-<span id="cb2-22"><a href="#cb2-22"></a>        {</span>
-<span id="cb2-23"><a href="#cb2-23"></a>            self<span class="op">$</span>clust_size &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(num_instances<span class="op">$</span>value)</span>
-<span id="cb2-24"><a href="#cb2-24"></a>            vmnames &lt;-<span class="st"> </span><span class="kw">paste0</span>(self<span class="op">$</span>name, <span class="kw">seq_len</span>(self<span class="op">$</span>clust_size) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)</span>
-<span id="cb2-25"><a href="#cb2-25"></a>        }</span>
-<span id="cb2-26"><a href="#cb2-26"></a></span>
-<span id="cb2-27"><a href="#cb2-27"></a>        private<span class="op">$</span>vm &lt;-<span class="st"> </span><span class="kw">sapply</span>(vmnames, <span class="cf">function</span>(name)</span>
-<span id="cb2-28"><a href="#cb2-28"></a>        {</span>
-<span id="cb2-29"><a href="#cb2-29"></a>            az_vm_resource<span class="op">$</span><span class="kw">new</span>(self<span class="op">$</span>token, self<span class="op">$</span>subscription, self<span class="op">$</span>resource_group,</span>
-<span id="cb2-30"><a href="#cb2-30"></a>                <span class="dt">type=</span><span class="st">&quot;Microsoft.Compute/virtualMachines&quot;</span>, <span class="dt">name=</span>name)</span>
-<span id="cb2-31"><a href="#cb2-31"></a>        }, <span class="dt">simplify=</span><span class="ot">FALSE</span>)</span>
-<span id="cb2-32"><a href="#cb2-32"></a></span>
-<span id="cb2-33"><a href="#cb2-33"></a>        <span class="co"># get the hostname/IP address for the VM</span></span>
-<span id="cb2-34"><a href="#cb2-34"></a>        outputs &lt;-<span class="st"> </span><span class="kw">unlist</span>(self<span class="op">$</span>properties<span class="op">$</span>outputResources)</span>
-<span id="cb2-35"><a href="#cb2-35"></a>        ip_id &lt;-<span class="st"> </span><span class="kw">grep</span>(<span class="st">&quot;publicIPAddresses/.+$&quot;</span>, outputs, <span class="dt">ignore.case=</span><span class="ot">TRUE</span>, <span class="dt">value=</span><span class="ot">TRUE</span>)</span>
-<span id="cb2-36"><a href="#cb2-36"></a>        ip &lt;-<span class="st"> </span><span class="kw">lapply</span>(ip_id, <span class="cf">function</span>(id)</span>
-<span id="cb2-37"><a href="#cb2-37"></a>            az_resource<span class="op">$</span><span class="kw">new</span>(self<span class="op">$</span>token, self<span class="op">$</span>subscription, <span class="dt">id=</span>id)<span class="op">$</span>properties)</span>
-<span id="cb2-38"><a href="#cb2-38"></a></span>
-<span id="cb2-39"><a href="#cb2-39"></a>        self<span class="op">$</span>ip_address &lt;-<span class="st"> </span><span class="kw">sapply</span>(ip, <span class="cf">function</span>(x) x<span class="op">$</span>ipAddress)</span>
-<span id="cb2-40"><a href="#cb2-40"></a>        self<span class="op">$</span>dns_name &lt;-<span class="st"> </span><span class="kw">sapply</span>(ip, <span class="cf">function</span>(x) x<span class="op">$</span>dnsSettings<span class="op">$</span>fqdn)</span>
-<span id="cb2-41"><a href="#cb2-41"></a></span>
-<span id="cb2-42"><a href="#cb2-42"></a>        <span class="kw">lapply</span>(private<span class="op">$</span>vm, <span class="cf">function</span>(obj) obj<span class="op">$</span><span class="kw">sync_vm_status</span>())</span>
-<span id="cb2-43"><a href="#cb2-43"></a>        self<span class="op">$</span>disks &lt;-<span class="st"> </span><span class="kw">lapply</span>(private<span class="op">$</span>vm, <span class="st">&quot;[[&quot;</span>, <span class="st">&quot;disks&quot;</span>)</span>
-<span id="cb2-44"><a href="#cb2-44"></a>        self<span class="op">$</span>status &lt;-<span class="st"> </span><span class="kw">lapply</span>(private<span class="op">$</span>vm, <span class="st">&quot;[[&quot;</span>, <span class="st">&quot;status&quot;</span>)</span>
-<span id="cb2-45"><a href="#cb2-45"></a></span>
-<span id="cb2-46"><a href="#cb2-46"></a>        <span class="ot">NULL</span></span>
-<span id="cb2-47"><a href="#cb2-47"></a>    }</span>
-<span id="cb2-48"><a href="#cb2-48"></a></span>
-<span id="cb2-49"><a href="#cb2-49"></a>    <span class="co"># ... other VM-specific methods ...</span></span>
-<span id="cb2-50"><a href="#cb2-50"></a>),</span>
-<span id="cb2-51"><a href="#cb2-51"></a></span>
-<span id="cb2-52"><a href="#cb2-52"></a><span class="dt">private=</span><span class="kw">list</span>(</span>
-<span id="cb2-53"><a href="#cb2-53"></a>    <span class="co"># will store a list of VM objects after initialisation</span></span>
-<span id="cb2-54"><a href="#cb2-54"></a>    <span class="dt">vm=</span><span class="ot">NULL</span></span>
-<span id="cb2-55"><a href="#cb2-55"></a></span>
-<span id="cb2-56"><a href="#cb2-56"></a>    <span class="co"># ... other private members ...</span></span>
-<span id="cb2-57"><a href="#cb2-57"></a>)</span>
-<span id="cb2-58"><a href="#cb2-58"></a>)<span class="er">)</span></span></code></pre></div>
+<p>Create subclasses of <code>az_resource</code> and/or
+<code>az_template</code> to represent the resources used by this
+service. For example, the AzureStor package provides a new class,
+<code>az_storage</code>, that inherits from <code>az_resource</code>.
+This class represents a storage accounts and has new methods specific to
+storage, such as listing access keys, generating a shared access
+signature (SAS), and creating a client endpoint object. Here is a
+simplified version of the <code>az_storage</code> class.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>az_storage <span class="ot">&lt;-</span> R6<span class="sc">::</span><span class="fu">R6Class</span>(<span class="st">&quot;az_storage&quot;</span>, <span class="at">inherit=</span>AzureRMR<span class="sc">::</span>az_resource,</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="at">public=</span><span class="fu">list</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>    <span class="at">list_keys=</span><span class="cf">function</span>()</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    {</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>        keys <span class="ot">&lt;-</span> <span class="fu">named_list</span>(private<span class="sc">$</span><span class="fu">res_op</span>(<span class="st">&quot;listKeys&quot;</span>, <span class="at">http_verb=</span><span class="st">&quot;POST&quot;</span>)<span class="sc">$</span>keys, <span class="st">&quot;keyName&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>        <span class="fu">sapply</span>(keys, <span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="st">&quot;value&quot;</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>    },</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>    <span class="at">get_blob_endpoint=</span><span class="cf">function</span>(<span class="at">key=</span>self<span class="sc">$</span><span class="fu">list_keys</span>()[<span class="dv">1</span>], <span class="at">sas=</span><span class="cn">NULL</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>    {</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>        <span class="fu">blob_endpoint</span>(self<span class="sc">$</span>properties<span class="sc">$</span>primaryEndpoints<span class="sc">$</span>blob, <span class="at">key=</span>key, <span class="at">sas=</span>sas)</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>    },</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>    <span class="at">get_file_endpoint=</span><span class="cf">function</span>(<span class="at">key=</span>self<span class="sc">$</span><span class="fu">list_keys</span>()[<span class="dv">1</span>], <span class="at">sas=</span><span class="cn">NULL</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>    {</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>        <span class="fu">file_endpoint</span>(self<span class="sc">$</span>properties<span class="sc">$</span>primaryEndpoints<span class="sc">$</span>file, <span class="at">key=</span>key, <span class="at">sas=</span>sas)</span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>    }</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>))</span></code></pre></div>
+<p>In most cases, you can rely on the default
+<code>az_resource$initialize</code> method to handle object
+construction. You can override this method if your resource class
+contains new data fields that have to be initialised.</p>
+<p>A more complex example of a custom class is the
+<code>az_vm_template</code> class in the AzureVM package. This
+represents the resources used by a virtual machine, or cluster of
+virtual machines, in Azure. The initialisation code not only handles the
+details of deploying or getting the template used to create the VM(s),
+but also retrieves the individual resource objects themselves.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>az_vm_template <span class="ot">&lt;-</span> R6<span class="sc">::</span><span class="fu">R6Class</span>(<span class="st">&quot;az_vm_template&quot;</span>, <span class="at">inherit=</span>AzureRMR<span class="sc">::</span>az_template,</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="at">public=</span><span class="fu">list</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="at">disks=</span><span class="cn">NULL</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    <span class="at">status=</span><span class="cn">NULL</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>    <span class="at">ip_address=</span><span class="cn">NULL</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    <span class="at">dns_name=</span><span class="cn">NULL</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>    <span class="at">clust_size=</span><span class="cn">NULL</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>    <span class="at">initialize=</span><span class="cf">function</span>(token, subscription, resource_group, name, ...)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>    {</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>        super<span class="sc">$</span><span class="fu">initialize</span>(token, subscription, resource_group, name, ...)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>        <span class="co"># fill in fields that don&#39;t require querying the host</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>        num_instances <span class="ot">&lt;-</span> self<span class="sc">$</span>properties<span class="sc">$</span>outputs<span class="sc">$</span>numInstances</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>        <span class="cf">if</span>(<span class="fu">is_empty</span>(num_instances))</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>        {</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>            self<span class="sc">$</span>clust_size <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>            vmnames <span class="ot">&lt;-</span> self<span class="sc">$</span>name</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>        }</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>        <span class="cf">else</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>        {</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>            self<span class="sc">$</span>clust_size <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(num_instances<span class="sc">$</span>value)</span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>            vmnames <span class="ot">&lt;-</span> <span class="fu">paste0</span>(self<span class="sc">$</span>name, <span class="fu">seq_len</span>(self<span class="sc">$</span>clust_size) <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>        }</span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>        private<span class="sc">$</span>vm <span class="ot">&lt;-</span> <span class="fu">sapply</span>(vmnames, <span class="cf">function</span>(name)</span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>        {</span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>            az_vm_resource<span class="sc">$</span><span class="fu">new</span>(self<span class="sc">$</span>token, self<span class="sc">$</span>subscription, self<span class="sc">$</span>resource_group,</span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a>                <span class="at">type=</span><span class="st">&quot;Microsoft.Compute/virtualMachines&quot;</span>, <span class="at">name=</span>name)</span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>        }, <span class="at">simplify=</span><span class="cn">FALSE</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a>        <span class="co"># get the hostname/IP address for the VM</span></span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a>        outputs <span class="ot">&lt;-</span> <span class="fu">unlist</span>(self<span class="sc">$</span>properties<span class="sc">$</span>outputResources)</span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a>        ip_id <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">&quot;publicIPAddresses/.+$&quot;</span>, outputs, <span class="at">ignore.case=</span><span class="cn">TRUE</span>, <span class="at">value=</span><span class="cn">TRUE</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>        ip <span class="ot">&lt;-</span> <span class="fu">lapply</span>(ip_id, <span class="cf">function</span>(id)</span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>            az_resource<span class="sc">$</span><span class="fu">new</span>(self<span class="sc">$</span>token, self<span class="sc">$</span>subscription, <span class="at">id=</span>id)<span class="sc">$</span>properties)</span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a>        self<span class="sc">$</span>ip_address <span class="ot">&lt;-</span> <span class="fu">sapply</span>(ip, <span class="cf">function</span>(x) x<span class="sc">$</span>ipAddress)</span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a>        self<span class="sc">$</span>dns_name <span class="ot">&lt;-</span> <span class="fu">sapply</span>(ip, <span class="cf">function</span>(x) x<span class="sc">$</span>dnsSettings<span class="sc">$</span>fqdn)</span>
+<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a>        <span class="fu">lapply</span>(private<span class="sc">$</span>vm, <span class="cf">function</span>(obj) obj<span class="sc">$</span><span class="fu">sync_vm_status</span>())</span>
+<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a>        self<span class="sc">$</span>disks <span class="ot">&lt;-</span> <span class="fu">lapply</span>(private<span class="sc">$</span>vm, <span class="st">&quot;[[&quot;</span>, <span class="st">&quot;disks&quot;</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a>        self<span class="sc">$</span>status <span class="ot">&lt;-</span> <span class="fu">lapply</span>(private<span class="sc">$</span>vm, <span class="st">&quot;[[&quot;</span>, <span class="st">&quot;status&quot;</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a>        <span class="cn">NULL</span></span>
+<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a>    }</span>
+<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a>    <span class="co"># ... other VM-specific methods ...</span></span>
+<span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a>),</span>
+<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a></span>
+<span id="cb2-52"><a href="#cb2-52" tabindex="-1"></a><span class="at">private=</span><span class="fu">list</span>(</span>
+<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a>    <span class="co"># will store a list of VM objects after initialisation</span></span>
+<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a>    <span class="at">vm=</span><span class="cn">NULL</span></span>
+<span id="cb2-55"><a href="#cb2-55" tabindex="-1"></a></span>
+<span id="cb2-56"><a href="#cb2-56" tabindex="-1"></a>    <span class="co"># ... other private members ...</span></span>
+<span id="cb2-57"><a href="#cb2-57" tabindex="-1"></a>)</span>
+<span id="cb2-58"><a href="#cb2-58" tabindex="-1"></a>)<span class="er">)</span></span></code></pre></div>
 </div>
 <div id="add-accessor-functions" class="section level2">
 <h2>Add accessor functions</h2>
-<p>Once you’ve created your new class(es), you should add accessor functions to <code>az_resource_group</code> (and optionally <code>az_subscription</code> as well, if your service has subscription-level API calls) to create, get and delete resources. This allows the convenience of <em>method chaining</em>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>res &lt;-<span class="st"> </span>az_rm<span class="op">$</span><span class="kw">new</span>(<span class="st">&quot;tenant_id&quot;</span>, <span class="st">&quot;app_id&quot;</span>, <span class="st">&quot;secret&quot;</span>) <span class="op">$</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="st">    </span><span class="kw">get_subscription</span>(<span class="st">&quot;subscription_id&quot;</span>) <span class="op">$</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="st">    </span><span class="kw">get_resource_group</span>(<span class="st">&quot;resgroup&quot;</span>) <span class="op">$</span></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="st">    </span><span class="kw">get_my_resource</span>(<span class="st">&quot;myresource&quot;</span>)</span></code></pre></div>
-<p>Note that if you are writing a package that extends AzureRMR, these methods <em>must</em> be defined in the package’s <code>.onLoad</code> function. This is because the methods must be added at runtime, when the user loads your package, rather than at compile time, when it is built or installed.</p>
-<p>The <code>create_storage_account</code>, <code>get_storage_account</code> and <code>delete_storage_account</code> methods from the AzureStor package are defined like this. Note that calls to your class methods should include the <code>pkgname::</code> qualifier, to ensure they will work even if your package is not attached.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># all methods adding methods to classes in external package must go in .onLoad</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname)</span>
-<span id="cb4-3"><a href="#cb4-3"></a>{</span>
-<span id="cb4-4"><a href="#cb4-4"></a>    AzureRMR<span class="op">::</span>az_resource_group<span class="op">$</span><span class="kw">set</span>(<span class="st">&quot;public&quot;</span>, <span class="st">&quot;create_storage_account&quot;</span>, <span class="dt">overwrite=</span><span class="ot">TRUE</span>,</span>
-<span id="cb4-5"><a href="#cb4-5"></a>    <span class="cf">function</span>(name, location,</span>
-<span id="cb4-6"><a href="#cb4-6"></a>             <span class="dt">kind=</span><span class="st">&quot;Storage&quot;</span>,</span>
-<span id="cb4-7"><a href="#cb4-7"></a>             <span class="dt">sku=</span><span class="kw">list</span>(<span class="dt">name=</span><span class="st">&quot;Standard_LRS&quot;</span>, <span class="dt">tier=</span><span class="st">&quot;Standard&quot;</span>),</span>
-<span id="cb4-8"><a href="#cb4-8"></a>             ...)</span>
-<span id="cb4-9"><a href="#cb4-9"></a>    {</span>
-<span id="cb4-10"><a href="#cb4-10"></a>        AzureStor<span class="op">::</span>az_storage<span class="op">$</span><span class="kw">new</span>(self<span class="op">$</span>token, self<span class="op">$</span>subscription, self<span class="op">$</span>name,</span>
-<span id="cb4-11"><a href="#cb4-11"></a>            <span class="dt">type=</span><span class="st">&quot;Microsoft.Storage/storageAccounts&quot;</span>, <span class="dt">name=</span>name, <span class="dt">location=</span>location,</span>
-<span id="cb4-12"><a href="#cb4-12"></a>            <span class="dt">kind=</span>kind, <span class="dt">sku=</span>sku, ...)</span>
-<span id="cb4-13"><a href="#cb4-13"></a>    })</span>
-<span id="cb4-14"><a href="#cb4-14"></a></span>
-<span id="cb4-15"><a href="#cb4-15"></a>    AzureRMR<span class="op">::</span>az_resource_group<span class="op">$</span><span class="kw">set</span>(<span class="st">&quot;public&quot;</span>, <span class="st">&quot;get_storage_account&quot;</span>, <span class="dt">overwrite=</span><span class="ot">TRUE</span>,</span>
-<span id="cb4-16"><a href="#cb4-16"></a>    <span class="cf">function</span>(name)</span>
-<span id="cb4-17"><a href="#cb4-17"></a>    {</span>
-<span id="cb4-18"><a href="#cb4-18"></a>        AzureStor<span class="op">::</span>az_storage<span class="op">$</span><span class="kw">new</span>(self<span class="op">$</span>token, self<span class="op">$</span>subscription, self<span class="op">$</span>name,</span>
-<span id="cb4-19"><a href="#cb4-19"></a>            <span class="dt">type=</span><span class="st">&quot;Microsoft.Storage/storageAccounts&quot;</span>, <span class="dt">name=</span>name)</span>
-<span id="cb4-20"><a href="#cb4-20"></a>    })</span>
-<span id="cb4-21"><a href="#cb4-21"></a></span>
-<span id="cb4-22"><a href="#cb4-22"></a>    AzureRMR<span class="op">::</span>az_resource_group<span class="op">$</span><span class="kw">set</span>(<span class="st">&quot;public&quot;</span>, <span class="st">&quot;delete_storage_account&quot;</span>, <span class="dt">overwrite=</span><span class="ot">TRUE</span>,</span>
-<span id="cb4-23"><a href="#cb4-23"></a>    <span class="cf">function</span>(name, <span class="dt">confirm=</span><span class="ot">TRUE</span>, <span class="dt">wait=</span><span class="ot">FALSE</span>)</span>
-<span id="cb4-24"><a href="#cb4-24"></a>    {</span>
-<span id="cb4-25"><a href="#cb4-25"></a>        self<span class="op">$</span><span class="kw">get_storage_account</span>(name)<span class="op">$</span><span class="kw">delete</span>(<span class="dt">confirm=</span>confirm, <span class="dt">wait=</span>wait)</span>
-<span id="cb4-26"><a href="#cb4-26"></a>    })</span>
-<span id="cb4-27"><a href="#cb4-27"></a></span>
-<span id="cb4-28"><a href="#cb4-28"></a>    <span class="co"># ... other startup code ...</span></span>
-<span id="cb4-29"><a href="#cb4-29"></a>}</span></code></pre></div>
-<p>The corresponding accessor functions for AzureVM’s <code>az_vm_template</code> class are more complex, as might be imagined. Here is a fragment of that package’s <code>onLoad</code> function showing the <code>az_resource_group$create_vm_cluster</code> method.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>.onLoad &lt;-<span class="st"> </span><span class="cf">function</span>(libname, pkgname)</span>
-<span id="cb5-2"><a href="#cb5-2"></a>{</span>
-<span id="cb5-3"><a href="#cb5-3"></a>    AzureRMR<span class="op">::</span>az_resource_group<span class="op">$</span><span class="kw">set</span>(<span class="st">&quot;public&quot;</span>, <span class="st">&quot;create_vm_cluster&quot;</span>, <span class="dt">overwrite=</span><span class="ot">TRUE</span>,</span>
-<span id="cb5-4"><a href="#cb5-4"></a>    <span class="cf">function</span>(name, location,</span>
-<span id="cb5-5"><a href="#cb5-5"></a>             <span class="dt">os=</span><span class="kw">c</span>(<span class="st">&quot;Windows&quot;</span>, <span class="st">&quot;Ubuntu&quot;</span>), <span class="dt">size=</span><span class="st">&quot;Standard_DS3_v2&quot;</span>,</span>
-<span id="cb5-6"><a href="#cb5-6"></a>             username, passkey, <span class="dt">userauth_type=</span><span class="kw">c</span>(<span class="st">&quot;password&quot;</span>, <span class="st">&quot;key&quot;</span>),</span>
-<span id="cb5-7"><a href="#cb5-7"></a>             <span class="dt">ext_file_uris=</span><span class="ot">NULL</span>, <span class="dt">inst_command=</span><span class="ot">NULL</span>,</span>
-<span id="cb5-8"><a href="#cb5-8"></a>             clust_size, template, parameters,</span>
-<span id="cb5-9"><a href="#cb5-9"></a>             ..., <span class="dt">wait=</span><span class="ot">TRUE</span>)</span>
-<span id="cb5-10"><a href="#cb5-10"></a>    {</span>
-<span id="cb5-11"><a href="#cb5-11"></a>        os &lt;-<span class="st"> </span><span class="kw">match.arg</span>(os)</span>
-<span id="cb5-12"><a href="#cb5-12"></a>        userauth_type &lt;-<span class="st"> </span><span class="kw">match.arg</span>(userauth_type)</span>
-<span id="cb5-13"><a href="#cb5-13"></a></span>
-<span id="cb5-14"><a href="#cb5-14"></a>        <span class="cf">if</span>(<span class="kw">missing</span>(parameters) <span class="op">&amp;&amp;</span><span class="st"> </span>(<span class="kw">missing</span>(username) <span class="op">||</span><span class="st"> </span><span class="kw">missing</span>(passkey)))</span>
-<span id="cb5-15"><a href="#cb5-15"></a>            <span class="kw">stop</span>(<span class="st">&quot;Must supply login username and password/private key&quot;</span>, <span class="dt">call.=</span><span class="ot">FALSE</span>)</span>
-<span id="cb5-16"><a href="#cb5-16"></a></span>
-<span id="cb5-17"><a href="#cb5-17"></a>        <span class="co"># find template given input args</span></span>
-<span id="cb5-18"><a href="#cb5-18"></a>        <span class="cf">if</span>(<span class="kw">missing</span>(template))</span>
-<span id="cb5-19"><a href="#cb5-19"></a>            template &lt;-<span class="st"> </span><span class="kw">get_dsvm_template</span>(os, userauth_type, clust_size,</span>
-<span id="cb5-20"><a href="#cb5-20"></a>                                          ext_file_uris, inst_command)</span>
-<span id="cb5-21"><a href="#cb5-21"></a></span>
-<span id="cb5-22"><a href="#cb5-22"></a>        <span class="co"># convert input args into parameter list for template</span></span>
-<span id="cb5-23"><a href="#cb5-23"></a>        <span class="cf">if</span>(<span class="kw">missing</span>(parameters))</span>
-<span id="cb5-24"><a href="#cb5-24"></a>            parameters &lt;-<span class="st"> </span><span class="kw">make_dsvm_param_list</span>(<span class="dt">name=</span>name, <span class="dt">size=</span>size,</span>
-<span id="cb5-25"><a href="#cb5-25"></a>                <span class="dt">username=</span>username, <span class="dt">userauth_type=</span>userauth_type, <span class="dt">passkey=</span>passkey,</span>
-<span id="cb5-26"><a href="#cb5-26"></a>                <span class="dt">ext_file_uris=</span>ext_file_uris, <span class="dt">inst_command=</span>inst_command,</span>
-<span id="cb5-27"><a href="#cb5-27"></a>                <span class="dt">clust_size=</span>clust_size, <span class="dt">template=</span>template)</span>
-<span id="cb5-28"><a href="#cb5-28"></a></span>
-<span id="cb5-29"><a href="#cb5-29"></a>        AzureVM<span class="op">::</span>az_vm_template<span class="op">$</span><span class="kw">new</span>(self<span class="op">$</span>token, self<span class="op">$</span>subscription, self<span class="op">$</span>name, name,</span>
-<span id="cb5-30"><a href="#cb5-30"></a>            <span class="dt">template=</span>template, <span class="dt">parameters=</span>parameters, ..., <span class="dt">wait=</span>wait)</span>
-<span id="cb5-31"><a href="#cb5-31"></a>    })</span>
-<span id="cb5-32"><a href="#cb5-32"></a></span>
-<span id="cb5-33"><a href="#cb5-33"></a>    <span class="co"># ... other startup code ...</span></span>
-<span id="cb5-34"><a href="#cb5-34"></a>}</span></code></pre></div>
+<p>Once you’ve created your new class(es), you should add accessor
+functions to <code>az_resource_group</code> (and optionally
+<code>az_subscription</code> as well, if your service has
+subscription-level API calls) to create, get and delete resources. This
+allows the convenience of <em>method chaining</em>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>res <span class="ot">&lt;-</span> az_rm<span class="sc">$</span><span class="fu">new</span>(<span class="st">&quot;tenant_id&quot;</span>, <span class="st">&quot;app_id&quot;</span>, <span class="st">&quot;secret&quot;</span>) <span class="sc">$</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>    <span class="fu">get_subscription</span>(<span class="st">&quot;subscription_id&quot;</span>) <span class="sc">$</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>    <span class="fu">get_resource_group</span>(<span class="st">&quot;resgroup&quot;</span>) <span class="sc">$</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>    <span class="fu">get_my_resource</span>(<span class="st">&quot;myresource&quot;</span>)</span></code></pre></div>
+<p>Note that if you are writing a package that extends AzureRMR, these
+methods <em>must</em> be defined in the package’s <code>.onLoad</code>
+function. This is because the methods must be added at runtime, when the
+user loads your package, rather than at compile time, when it is built
+or installed.</p>
+<p>The <code>create_storage_account</code>,
+<code>get_storage_account</code> and <code>delete_storage_account</code>
+methods from the AzureStor package are defined like this. Note that
+calls to your class methods should include the <code>pkgname::</code>
+qualifier, to ensure they will work even if your package is not
+attached.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># all methods adding methods to classes in external package must go in .onLoad</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>.onLoad <span class="ot">&lt;-</span> <span class="cf">function</span>(libname, pkgname)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>{</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    AzureRMR<span class="sc">::</span>az_resource_group<span class="sc">$</span><span class="fu">set</span>(<span class="st">&quot;public&quot;</span>, <span class="st">&quot;create_storage_account&quot;</span>, <span class="at">overwrite=</span><span class="cn">TRUE</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>    <span class="cf">function</span>(name, location,</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>             <span class="at">kind=</span><span class="st">&quot;Storage&quot;</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>             <span class="at">sku=</span><span class="fu">list</span>(<span class="at">name=</span><span class="st">&quot;Standard_LRS&quot;</span>, <span class="at">tier=</span><span class="st">&quot;Standard&quot;</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>             ...)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    {</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>        AzureStor<span class="sc">::</span>az_storage<span class="sc">$</span><span class="fu">new</span>(self<span class="sc">$</span>token, self<span class="sc">$</span>subscription, self<span class="sc">$</span>name,</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>            <span class="at">type=</span><span class="st">&quot;Microsoft.Storage/storageAccounts&quot;</span>, <span class="at">name=</span>name, <span class="at">location=</span>location,</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>            <span class="at">kind=</span>kind, <span class="at">sku=</span>sku, ...)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>    })</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>    AzureRMR<span class="sc">::</span>az_resource_group<span class="sc">$</span><span class="fu">set</span>(<span class="st">&quot;public&quot;</span>, <span class="st">&quot;get_storage_account&quot;</span>, <span class="at">overwrite=</span><span class="cn">TRUE</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>    <span class="cf">function</span>(name)</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>    {</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>        AzureStor<span class="sc">::</span>az_storage<span class="sc">$</span><span class="fu">new</span>(self<span class="sc">$</span>token, self<span class="sc">$</span>subscription, self<span class="sc">$</span>name,</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>            <span class="at">type=</span><span class="st">&quot;Microsoft.Storage/storageAccounts&quot;</span>, <span class="at">name=</span>name)</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>    })</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>    AzureRMR<span class="sc">::</span>az_resource_group<span class="sc">$</span><span class="fu">set</span>(<span class="st">&quot;public&quot;</span>, <span class="st">&quot;delete_storage_account&quot;</span>, <span class="at">overwrite=</span><span class="cn">TRUE</span>,</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>    <span class="cf">function</span>(name, <span class="at">confirm=</span><span class="cn">TRUE</span>, <span class="at">wait=</span><span class="cn">FALSE</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>    {</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>        self<span class="sc">$</span><span class="fu">get_storage_account</span>(name)<span class="sc">$</span><span class="fu">delete</span>(<span class="at">confirm=</span>confirm, <span class="at">wait=</span>wait)</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>    })</span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>    <span class="co"># ... other startup code ...</span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>}</span></code></pre></div>
+<p>The corresponding accessor functions for AzureVM’s
+<code>az_vm_template</code> class are more complex, as might be
+imagined. Here is a fragment of that package’s <code>onLoad</code>
+function showing the <code>az_resource_group$create_vm_cluster</code>
+method.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>.onLoad <span class="ot">&lt;-</span> <span class="cf">function</span>(libname, pkgname)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>{</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>    AzureRMR<span class="sc">::</span>az_resource_group<span class="sc">$</span><span class="fu">set</span>(<span class="st">&quot;public&quot;</span>, <span class="st">&quot;create_vm_cluster&quot;</span>, <span class="at">overwrite=</span><span class="cn">TRUE</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    <span class="cf">function</span>(name, location,</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>             <span class="at">os=</span><span class="fu">c</span>(<span class="st">&quot;Windows&quot;</span>, <span class="st">&quot;Ubuntu&quot;</span>), <span class="at">size=</span><span class="st">&quot;Standard_DS3_v2&quot;</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>             username, passkey, <span class="at">userauth_type=</span><span class="fu">c</span>(<span class="st">&quot;password&quot;</span>, <span class="st">&quot;key&quot;</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>             <span class="at">ext_file_uris=</span><span class="cn">NULL</span>, <span class="at">inst_command=</span><span class="cn">NULL</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>             clust_size, template, parameters,</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>             ..., <span class="at">wait=</span><span class="cn">TRUE</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>    {</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>        os <span class="ot">&lt;-</span> <span class="fu">match.arg</span>(os)</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>        userauth_type <span class="ot">&lt;-</span> <span class="fu">match.arg</span>(userauth_type)</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>        <span class="cf">if</span>(<span class="fu">missing</span>(parameters) <span class="sc">&amp;&amp;</span> (<span class="fu">missing</span>(username) <span class="sc">||</span> <span class="fu">missing</span>(passkey)))</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>            <span class="fu">stop</span>(<span class="st">&quot;Must supply login username and password/private key&quot;</span>, <span class="at">call.=</span><span class="cn">FALSE</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>        <span class="co"># find template given input args</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>        <span class="cf">if</span>(<span class="fu">missing</span>(template))</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>            template <span class="ot">&lt;-</span> <span class="fu">get_dsvm_template</span>(os, userauth_type, clust_size,</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>                                          ext_file_uris, inst_command)</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>        <span class="co"># convert input args into parameter list for template</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>        <span class="cf">if</span>(<span class="fu">missing</span>(parameters))</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>            parameters <span class="ot">&lt;-</span> <span class="fu">make_dsvm_param_list</span>(<span class="at">name=</span>name, <span class="at">size=</span>size,</span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>                <span class="at">username=</span>username, <span class="at">userauth_type=</span>userauth_type, <span class="at">passkey=</span>passkey,</span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>                <span class="at">ext_file_uris=</span>ext_file_uris, <span class="at">inst_command=</span>inst_command,</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>                <span class="at">clust_size=</span>clust_size, <span class="at">template=</span>template)</span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>        AzureVM<span class="sc">::</span>az_vm_template<span class="sc">$</span><span class="fu">new</span>(self<span class="sc">$</span>token, self<span class="sc">$</span>subscription, self<span class="sc">$</span>name, name,</span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a>            <span class="at">template=</span>template, <span class="at">parameters=</span>parameters, ..., <span class="at">wait=</span>wait)</span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a>    })</span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a>    <span class="co"># ... other startup code ...</span></span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a>}</span></code></pre></div>
 <div id="adding-documentation" class="section level3">
 <h3>Adding documentation</h3>
-<p>Documenting methods added to a class in this way can be problematic. R’s .Rd help format is designed around traditional functions, and R6 classes and methods are usually not a good fit. The popular Roxygen format also (as of October 2018) doesn’t deal very well with R6 classes. The fact that we are adding methods to a class defined in an external package is an additional complication.</p>
-<p>Here is an example documentation skeleton in Roxygen format, copied from AzureStor. You can add this as a separate block in the source file where you define the accessor method(s). The block uses Markdown formatting, so you will need to have installed roxygen2 version 6.0.1 or later.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">#&#39; Get existing Azure resource type &#39;foo&#39;</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&#39;</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&#39; Methods for the [AzureRMR::az_resource_group] and [AzureRMR::az_subscription] classes.</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&#39;</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&#39; @rdname get_foo</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&#39; @name get_foo</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&#39; @aliases get_foo list_foos</span></span>
-<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&#39;</span></span>
-<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&#39; @section Usage:</span></span>
-<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&#39; ```</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&#39; get_foo(name)</span></span>
-<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&#39; list_foos()</span></span>
-<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&#39; ```</span></span>
-<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&#39; @section Arguments:</span></span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&#39; - `name`: For `get_foo()`, the name of the resource.</span></span>
-<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&#39;</span></span>
-<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&#39; @section Details:</span></span>
-<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&#39; The `AzureRMR::az_resource_group` class has both `get_foo()` and `list_foos()` methods, while the `AzureRMR::az_subscription` class only has the latter.</span></span>
-<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&#39;</span></span>
-<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&#39; @section Value:</span></span>
-<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&#39; For `get_foo()`, an object of class `az_foo` representing the foo resource.</span></span>
-<span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&#39;</span></span>
-<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&#39; For `list_foos()`, a list of such objects.</span></span>
-<span id="cb6-24"><a href="#cb6-24"></a><span class="co">#&#39;</span></span>
-<span id="cb6-25"><a href="#cb6-25"></a><span class="co">#&#39; @seealso</span></span>
-<span id="cb6-26"><a href="#cb6-26"></a><span class="co">#&#39; [create_foo], [delete_foo], [az_foo]</span></span>
-<span id="cb6-27"><a href="#cb6-27"></a><span class="ot">NULL</span></span></code></pre></div>
-<p>We note the following: - The <code>@aliases</code> tag includes all the names that will bring up this page when using the <code>?</code> command, <em>including</em> the default name. - Rather than using the standard <code>@usage</code>, <code>@param</code>, <code>@details</code> and <code>@return</code> tags, the block uses <code>@section</code> to create sections with the appropriate titles (including one named ‘Arguments’). - The usage block is explicitly formatted as fixed-width using Markdown backticks. - The arguments are formatted as a (bulleted) list rather than the usual table format for function arguments.</p>
-<p>These changes are necessary because what we’re technically documenting is not a standalone function, but a method inside a class. The <code>@usage</code>, <code>@param</code> tags et al only apply to functions, and if you use them here, <code>R CMD check</code> will generate a warning when it can’t find a function with the given name. This can be important if you want to publish your package on CRAN.</p>
+<p>Documenting methods added to a class in this way can be problematic.
+R’s .Rd help format is designed around traditional functions, and R6
+classes and methods are usually not a good fit. The popular Roxygen
+format also (as of October 2018) doesn’t deal very well with R6 classes.
+The fact that we are adding methods to a class defined in an external
+package is an additional complication.</p>
+<p>Here is an example documentation skeleton in Roxygen format, copied
+from AzureStor. You can add this as a separate block in the source file
+where you define the accessor method(s). The block uses Markdown
+formatting, so you will need to have installed roxygen2 version 6.0.1 or
+later.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co">#&#39; Get existing Azure resource type &#39;foo&#39;</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&#39; Methods for the [AzureRMR::az_resource_group] and [AzureRMR::az_subscription] classes.</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&#39; @rdname get_foo</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&#39; @name get_foo</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&#39; @aliases get_foo list_foos</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&#39; @section Usage:</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&#39; ```</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&#39; get_foo(name)</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&#39; list_foos()</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&#39; ```</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&#39; @section Arguments:</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&#39; - `name`: For `get_foo()`, the name of the resource.</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&#39; @section Details:</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&#39; The `AzureRMR::az_resource_group` class has both `get_foo()` and `list_foos()` methods, while the `AzureRMR::az_subscription` class only has the latter.</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&#39; @section Value:</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&#39; For `get_foo()`, an object of class `az_foo` representing the foo resource.</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&#39; For `list_foos()`, a list of such objects.</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&#39; @seealso</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&#39; [create_foo], [delete_foo], [az_foo]</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div>
+<p>We note the following: - The <code>@aliases</code> tag includes all
+the names that will bring up this page when using the <code>?</code>
+command, <em>including</em> the default name. - Rather than using the
+standard <code>@usage</code>, <code>@param</code>, <code>@details</code>
+and <code>@return</code> tags, the block uses <code>@section</code> to
+create sections with the appropriate titles (including one named
+‘Arguments’). - The usage block is explicitly formatted as fixed-width
+using Markdown backticks. - The arguments are formatted as a (bulleted)
+list rather than the usual table format for function arguments.</p>
+<p>These changes are necessary because what we’re technically
+documenting is not a standalone function, but a method inside a class.
+The <code>@usage</code>, <code>@param</code> tags et al only apply to
+functions, and if you use them here, <code>R CMD check</code> will
+generate a warning when it can’t find a function with the given name.
+This can be important if you want to publish your package on CRAN.</p>
 </div>
 </div>
 <div id="add-client-facing-interface" class="section level2">
 <h2>Add client-facing interface</h2>
-<p>The AzureRMR class framework allows you to work with resources at the <em>Azure</em> level, via Azure Resource Manager. If a service exposes a <em>client</em> endpoint that is independent of ARM, you may also want to create a separate R interface for the endpoint.</p>
-<p>As the client interface is independent of the ARM interface, you have flexibility to tailor its design. For example, rather than using R6, the AzureStor package uses S3 classes to represent storage endpoints and individual containers and shares within an endpoint. It further defines (S3) methods for these classes to perform common operations like listing directories, uploading and downloading files, and so on. This is consistent with most other data access and manipulation packages in R, which usually stick to S3.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># blob endpoint for a storage account</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a>blob_endpoint &lt;-<span class="st"> </span><span class="cf">function</span>(endpoint, <span class="dt">key=</span><span class="ot">NULL</span>, <span class="dt">sas=</span><span class="ot">NULL</span>, <span class="dt">api_version=</span><span class="kw">getOption</span>(<span class="st">&quot;azure_storage_api_version&quot;</span>))</span>
-<span id="cb7-3"><a href="#cb7-3"></a>{</span>
-<span id="cb7-4"><a href="#cb7-4"></a>    <span class="cf">if</span>(<span class="op">!</span><span class="kw">is_endpoint_url</span>(endpoint, <span class="st">&quot;blob&quot;</span>))</span>
-<span id="cb7-5"><a href="#cb7-5"></a>        <span class="kw">stop</span>(<span class="st">&quot;Not a blob endpoint&quot;</span>, <span class="dt">call.=</span><span class="ot">FALSE</span>)</span>
-<span id="cb7-6"><a href="#cb7-6"></a></span>
-<span id="cb7-7"><a href="#cb7-7"></a>    obj &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">url=</span>endpoint, <span class="dt">key=</span>key, <span class="dt">sas=</span>sas, <span class="dt">api_version=</span>api_version)</span>
-<span id="cb7-8"><a href="#cb7-8"></a>    <span class="kw">class</span>(obj) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;blob_endpoint&quot;</span>, <span class="st">&quot;storage_endpoint&quot;</span>)</span>
-<span id="cb7-9"><a href="#cb7-9"></a>    obj</span>
-<span id="cb7-10"><a href="#cb7-10"></a>}</span>
-<span id="cb7-11"><a href="#cb7-11"></a></span>
-<span id="cb7-12"><a href="#cb7-12"></a></span>
-<span id="cb7-13"><a href="#cb7-13"></a><span class="co"># S3 generic and methods to create an object representing a blob container within an endpoint</span></span>
-<span id="cb7-14"><a href="#cb7-14"></a>blob_container &lt;-<span class="st"> </span><span class="cf">function</span>(endpoint, ...)</span>
-<span id="cb7-15"><a href="#cb7-15"></a>{</span>
-<span id="cb7-16"><a href="#cb7-16"></a>    <span class="kw">UseMethod</span>(<span class="st">&quot;blob_container&quot;</span>)</span>
-<span id="cb7-17"><a href="#cb7-17"></a>}</span>
-<span id="cb7-18"><a href="#cb7-18"></a></span>
-<span id="cb7-19"><a href="#cb7-19"></a>blob_container.character &lt;-<span class="st"> </span><span class="cf">function</span>(endpoint, <span class="dt">key=</span><span class="ot">NULL</span>, <span class="dt">sas=</span><span class="ot">NULL</span>,</span>
-<span id="cb7-20"><a href="#cb7-20"></a>                                     <span class="dt">api_version=</span><span class="kw">getOption</span>(<span class="st">&quot;azure_storage_api_version&quot;</span>))</span>
-<span id="cb7-21"><a href="#cb7-21"></a>{</span>
-<span id="cb7-22"><a href="#cb7-22"></a>    <span class="kw">do.call</span>(blob_container, <span class="kw">generate_endpoint_container</span>(endpoint, key, sas, api_version))</span>
-<span id="cb7-23"><a href="#cb7-23"></a>}</span>
-<span id="cb7-24"><a href="#cb7-24"></a></span>
-<span id="cb7-25"><a href="#cb7-25"></a>blob_container.blob_endpoint &lt;-<span class="st"> </span><span class="cf">function</span>(endpoint, name)</span>
-<span id="cb7-26"><a href="#cb7-26"></a>{</span>
-<span id="cb7-27"><a href="#cb7-27"></a>    obj &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">name=</span>name, <span class="dt">endpoint=</span>endpoint)</span>
-<span id="cb7-28"><a href="#cb7-28"></a>    <span class="kw">class</span>(obj) &lt;-<span class="st"> &quot;blob_container&quot;</span></span>
-<span id="cb7-29"><a href="#cb7-29"></a>    obj</span>
-<span id="cb7-30"><a href="#cb7-30"></a>}</span>
-<span id="cb7-31"><a href="#cb7-31"></a></span>
-<span id="cb7-32"><a href="#cb7-32"></a></span>
-<span id="cb7-33"><a href="#cb7-33"></a><span class="co"># download a file from a blob container</span></span>
-<span id="cb7-34"><a href="#cb7-34"></a>download_blob &lt;-<span class="st"> </span><span class="cf">function</span>(container, src, dest, <span class="dt">overwrite=</span><span class="ot">FALSE</span>, <span class="dt">lease=</span><span class="ot">NULL</span>)</span>
-<span id="cb7-35"><a href="#cb7-35"></a>{</span>
-<span id="cb7-36"><a href="#cb7-36"></a>    headers &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
-<span id="cb7-37"><a href="#cb7-37"></a>    <span class="cf">if</span>(<span class="op">!</span><span class="kw">is.null</span>(lease))</span>
-<span id="cb7-38"><a href="#cb7-38"></a>        headers[[<span class="st">&quot;x-ms-lease-id&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">as.character</span>(lease)</span>
-<span id="cb7-39"><a href="#cb7-39"></a>    <span class="kw">do_container_op</span>(container, src, <span class="dt">headers=</span>headers, <span class="dt">config=</span>httr<span class="op">::</span><span class="kw">write_disk</span>(dest, overwrite))</span>
-<span id="cb7-40"><a href="#cb7-40"></a>}</span></code></pre></div>
+<p>The AzureRMR class framework allows you to work with resources at the
+<em>Azure</em> level, via Azure Resource Manager. If a service exposes a
+<em>client</em> endpoint that is independent of ARM, you may also want
+to create a separate R interface for the endpoint.</p>
+<p>As the client interface is independent of the ARM interface, you have
+flexibility to tailor its design. For example, rather than using R6, the
+AzureStor package uses S3 classes to represent storage endpoints and
+individual containers and shares within an endpoint. It further defines
+(S3) methods for these classes to perform common operations like listing
+directories, uploading and downloading files, and so on. This is
+consistent with most other data access and manipulation packages in R,
+which usually stick to S3.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># blob endpoint for a storage account</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>blob_endpoint <span class="ot">&lt;-</span> <span class="cf">function</span>(endpoint, <span class="at">key=</span><span class="cn">NULL</span>, <span class="at">sas=</span><span class="cn">NULL</span>, <span class="at">api_version=</span><span class="fu">getOption</span>(<span class="st">&quot;azure_storage_api_version&quot;</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>{</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is_endpoint_url</span>(endpoint, <span class="st">&quot;blob&quot;</span>))</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>        <span class="fu">stop</span>(<span class="st">&quot;Not a blob endpoint&quot;</span>, <span class="at">call.=</span><span class="cn">FALSE</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>    obj <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">url=</span>endpoint, <span class="at">key=</span>key, <span class="at">sas=</span>sas, <span class="at">api_version=</span>api_version)</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>    <span class="fu">class</span>(obj) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;blob_endpoint&quot;</span>, <span class="st">&quot;storage_endpoint&quot;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    obj</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>}</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co"># S3 generic and methods to create an object representing a blob container within an endpoint</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>blob_container <span class="ot">&lt;-</span> <span class="cf">function</span>(endpoint, ...)</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>{</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>    <span class="fu">UseMethod</span>(<span class="st">&quot;blob_container&quot;</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>}</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>blob_container.character <span class="ot">&lt;-</span> <span class="cf">function</span>(endpoint, <span class="at">key=</span><span class="cn">NULL</span>, <span class="at">sas=</span><span class="cn">NULL</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>                                     <span class="at">api_version=</span><span class="fu">getOption</span>(<span class="st">&quot;azure_storage_api_version&quot;</span>))</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>{</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>    <span class="fu">do.call</span>(blob_container, <span class="fu">generate_endpoint_container</span>(endpoint, key, sas, api_version))</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>}</span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>blob_container.blob_endpoint <span class="ot">&lt;-</span> <span class="cf">function</span>(endpoint, name)</span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>{</span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a>    obj <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">name=</span>name, <span class="at">endpoint=</span>endpoint)</span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a>    <span class="fu">class</span>(obj) <span class="ot">&lt;-</span> <span class="st">&quot;blob_container&quot;</span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>    obj</span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a>}</span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="co"># download a file from a blob container</span></span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a>download_blob <span class="ot">&lt;-</span> <span class="cf">function</span>(container, src, dest, <span class="at">overwrite=</span><span class="cn">FALSE</span>, <span class="at">lease=</span><span class="cn">NULL</span>)</span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a>{</span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a>    headers <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.null</span>(lease))</span>
+<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a>        headers[[<span class="st">&quot;x-ms-lease-id&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">as.character</span>(lease)</span>
+<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a>    <span class="fu">do_container_op</span>(container, src, <span class="at">headers=</span>headers, <span class="at">config=</span>httr<span class="sc">::</span><span class="fu">write_disk</span>(dest, overwrite))</span>
+<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 
 

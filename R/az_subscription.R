@@ -7,12 +7,12 @@
 #' @docType class
 #' @section Methods:
 #' - `new(token, id, ...)`: Initialize a subscription object.
-#' - `list_resource_groups(filter, top)`: Return a list of resource group objects for this subscription. `filter` and `top` are optional arguments to filter the results; see the [Azure documentation](https://docs.microsoft.com/en-us/rest/api/resources/resourcegroups/list) for more details. If `top` is specified, the returned list will have a maximum of this many items.
+#' - `list_resource_groups(filter, top)`: Return a list of resource group objects for this subscription. `filter` and `top` are optional arguments to filter the results; see the [Azure documentation](https://learn.microsoft.com/en-us/rest/api/resources/resourcegroups/list) for more details. If `top` is specified, the returned list will have a maximum of this many items.
 #' - `get_resource_group(name)`: Return an object representing an existing resource group.
 #' - `create_resource_group(name, location)`: Create a new resource group in the specified region/location, and return an object representing it. By default, AzureRMR will set the `createdBy` tag on a newly-created resource group to the value `AzureR/AzureRMR`.
 #' - `delete_resource_group(name, confirm=TRUE)`: Delete a resource group, after asking for confirmation.
 #' - `resource_group_exists(name)`: Check if a resource group exists.
-#' - `list_resources(filter, expand, top)`: List all resources deployed under this subscription. `filter`, `expand` and `top` are optional arguments to filter the results; see the [Azure documentation](https://docs.microsoft.com/en-us/rest/api/resources/resources/list) for more details. If `top` is specified, the returned list will have a maximum of this many items.
+#' - `list_resources(filter, expand, top)`: List all resources deployed under this subscription. `filter`, `expand` and `top` are optional arguments to filter the results; see the [Azure documentation](https://learn.microsoft.com/en-us/rest/api/resources/resources/list) for more details. If `top` is specified, the returned list will have a maximum of this many items.
 #' - `list_locations(info=c("partial", "all"))`: List locations available. The default `info="partial"` returns a subset of the information about each location; set `info="all"` to return everything.
 #' - `get_provider_api_version(provider, type, which=1, stable_only=TRUE)`: Get the current API version for the given resource provider and type. If no resource type is supplied, returns a vector of API versions, one for each resource type for the given provider. If neither provider nor type is supplied, returns the API versions for all resources and providers. Set `stable_only=FALSE` to allow preview APIs to be returned. Set `which` to a number > 1 to return an API other than the most recent.
 #' - `do_operation(...)`: Carry out an operation. See 'Operations' for more details.
@@ -26,6 +26,7 @@
 #' - `list_role_assignments()`: Lists role assignments.
 #' - `get_role_definition(id)`: Retrieves an existing role definition.
 #' - `list_role_definitions()` Lists role definitions.
+#' - `get_tags()` Get the tags on this subscription.
 #'
 #' @section Details:
 #' Generally, the easiest way to create a subscription object is via the `get_subscription` or `list_subscriptions` methods of the [az_rm] class. To create a subscription object in isolation, call the `new()` method and supply an Oauth 2.0 token of class [AzureToken], along with the ID of the subscription.
@@ -43,7 +44,7 @@
 #' AzureRMR implements a subset of the full RBAC functionality within Azure Active Directory. You can retrieve role definitions and add and remove role assignments, at the subscription, resource group and resource levels. See [rbac] for more information.
 #'
 #' @seealso
-#' [Azure Resource Manager overview](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview)
+#' [Azure Resource Manager overview](https://learn.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview)
 #'
 #' For role-based access control methods, see [rbac]
 #'
@@ -85,6 +86,7 @@ public=list(
     state=NULL,
     policies=NULL,
     authorization_source=NULL,
+    tags=NULL,
     token=NULL,
 
     initialize=function(token, id=NULL, parms=list())
@@ -102,6 +104,7 @@ public=list(
         self$state <- parms$state
         self$policies <- parms$subscriptionPolicies
         self$authorization_source <- parms$authorizationSource
+        self$tags <- parms$tags
         NULL
     },
 
@@ -154,6 +157,13 @@ public=list(
             }
             else sapply(apis, select_version)
         }
+    },
+    
+    get_tags=function()
+    {
+        if(is.null(self$tags))
+            named_list()
+        else self$tags
     },
 
     get_resource_group=function(name)

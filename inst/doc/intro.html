@@ -15,74 +15,103 @@
 
 <title>Introduction to AzureRMR</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -91,13 +120,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -105,6 +141,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -305,241 +342,318 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<p>AzureRMR is a package for interacting with Azure Resource Manager: authenticate, list subscriptions, manage resource groups, deploy and delete templates and resources. It calls the Resource Manager <a href="https://docs.microsoft.com/en-us/rest/api/resources">REST API</a> directly, so you don’t need to have PowerShell or Python installed.</p>
-<p>As a general-purpose interface to Azure Resource Manager (ARM), you can use AzureRMR to work with nearly any Azure object that ARM can handle: subscriptions, resource groups, resources, templates and so on. The things you can do include:</p>
+<p>AzureRMR is a package for interacting with Azure Resource Manager:
+authenticate, list subscriptions, manage resource groups, deploy and
+delete templates and resources. It calls the Resource Manager <a href="https://learn.microsoft.com/en-us/rest/api/resources">REST API</a>
+directly, so you don’t need to have PowerShell or Python installed.</p>
+<p>As a general-purpose interface to Azure Resource Manager (ARM), you
+can use AzureRMR to work with nearly any Azure object that ARM can
+handle: subscriptions, resource groups, resources, templates and so on.
+The things you can do include:</p>
 <ul>
 <li>Create a new resource</li>
 <li>Carry out arbitrary operations on a resource</li>
 <li>Delete a resource</li>
 <li>Deploy a template</li>
-<li>Delete a template, and, optionally, any resources that it created</li>
-<li>Create and delete resource groups (if you gave your service principal subscription-level access)</li>
+<li>Delete a template, and, optionally, any resources that it
+created</li>
+<li>Create and delete resource groups (if you gave your service
+principal subscription-level access)</li>
 </ul>
 <div id="authentication" class="section level2">
 <h2>Authentication</h2>
-<p>Under the hood, AzureRMR uses a similar authentication process to the <a href="https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest">Azure CLI</a>. The first time you authenticate with a given Azure Active Directory tenant, you call <code>create_azure_login()</code>, which will log you into Azure. R will prompt you for permission to create a special data directory in which to save your credentials. Once this information is saved on your machine, it can be retrieved in subsequent R sessions with <code>get_azure_login()</code>. Your credentials will be automatically refreshed so you don’t have to reauthenticate.</p>
-<p>Unless you have a good reason otherwise, you should allow this caching directory to be created. Note that many other cloud engineering tools save credentials in this way, including the Azure CLI itself. You can see the location of the caching directory with the function <code>AzureR_dir()</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(AzureRMR)</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#&gt; The AzureR packages can save your authentication credentials in the directory:</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt;</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#&gt; C:\Users\hongooi\AppData\Local\AzureR</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#&gt;</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#&gt; This saves you having to reauthenticate with Azure in future sessions. Create this directory? (Y/n) y</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a></span>
-<span id="cb1-8"><a href="#cb1-8"></a><span class="kw">AzureR_dir</span>()</span>
-<span id="cb1-9"><a href="#cb1-9"></a><span class="co">#&gt; [1] &quot;C:\\Users\\hongooi\\AppData\\Local\\AzureR&quot;</span></span>
-<span id="cb1-10"><a href="#cb1-10"></a></span>
-<span id="cb1-11"><a href="#cb1-11"></a></span>
-<span id="cb1-12"><a href="#cb1-12"></a><span class="co"># if this is the first time you&#39;re logging in</span></span>
-<span id="cb1-13"><a href="#cb1-13"></a>az &lt;-<span class="st"> </span><span class="kw">create_azure_login</span>()</span>
-<span id="cb1-14"><a href="#cb1-14"></a><span class="co">#&gt; Creating Azure Resource Manager login for default tenant</span></span>
-<span id="cb1-15"><a href="#cb1-15"></a><span class="co">#&gt; Waiting for authentication in browser...</span></span>
-<span id="cb1-16"><a href="#cb1-16"></a><span class="co">#&gt; Press Esc/Ctrl + C to abort</span></span>
-<span id="cb1-17"><a href="#cb1-17"></a><span class="co">#&gt; Authentication complete.</span></span>
-<span id="cb1-18"><a href="#cb1-18"></a></span>
-<span id="cb1-19"><a href="#cb1-19"></a></span>
-<span id="cb1-20"><a href="#cb1-20"></a><span class="co"># for subsequent sessions</span></span>
-<span id="cb1-21"><a href="#cb1-21"></a>az &lt;-<span class="st"> </span><span class="kw">get_azure_login</span>()</span>
-<span id="cb1-22"><a href="#cb1-22"></a><span class="co">#&gt; Loading Azure Resource Manager login for default tenant</span></span>
-<span id="cb1-23"><a href="#cb1-23"></a></span>
-<span id="cb1-24"><a href="#cb1-24"></a></span>
-<span id="cb1-25"><a href="#cb1-25"></a><span class="co"># you can also list the tenants that you&#39;ve previously authenticated with</span></span>
-<span id="cb1-26"><a href="#cb1-26"></a><span class="kw">list_azure_logins</span>()</span></code></pre></div>
-<p>See the “Authentication basics” vignette for more details on how to authenticate with AzureRMR.</p>
+<p>Under the hood, AzureRMR uses a similar authentication process to the
+<a href="https://learn.microsoft.com/en-us/cli/azure/?view=azure-cli-latest">Azure
+CLI</a>. The first time you authenticate with a given Azure Active
+Directory tenant, you call <code>create_azure_login()</code>, which will
+log you into Azure. R will prompt you for permission to create a special
+data directory in which to save your credentials. Once this information
+is saved on your machine, it can be retrieved in subsequent R sessions
+with <code>get_azure_login()</code>. Your credentials will be
+automatically refreshed so you don’t have to reauthenticate.</p>
+<p>Unless you have a good reason otherwise, you should allow this
+caching directory to be created. Note that many other cloud engineering
+tools save credentials in this way, including the Azure CLI itself. You
+can see the location of the caching directory with the function
+<code>AzureR_dir()</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(AzureRMR)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#&gt; The AzureR packages can save your authentication credentials in the directory:</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">#&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt; C:\Users\hongooi\AppData\Local\AzureR</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; This saves you having to reauthenticate with Azure in future sessions. Create this directory? (Y/n) y</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="fu">AzureR_dir</span>()</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:\\Users\\hongooi\\AppData\\Local\\AzureR&quot;</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co"># if this is the first time you&#39;re logging in</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>az <span class="ot">&lt;-</span> <span class="fu">create_azure_login</span>()</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; Creating Azure Resource Manager login for default tenant</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; Waiting for authentication in browser...</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; Press Esc/Ctrl + C to abort</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; Authentication complete.</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co"># for subsequent sessions</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>az <span class="ot">&lt;-</span> <span class="fu">get_azure_login</span>()</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; Loading Azure Resource Manager login for default tenant</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="co"># you can also list the tenants that you&#39;ve previously authenticated with</span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="fu">list_azure_logins</span>()</span></code></pre></div>
+<p>See the “Authentication basics” vignette for more details on how to
+authenticate with AzureRMR.</p>
 </div>
 <div id="subscriptions-and-resource-groups" class="section level2">
 <h2>Subscriptions and resource groups</h2>
-<p>AzureRMR allows you to work with your subscriptions and resource groups. Note that if you created your service principal via the cloud shell, as described in this vignette, you probably only have access to one subscription. Regardless, you can list all subscriptions that you can work with:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># all subscriptions</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>az<span class="op">$</span><span class="kw">list_subscriptions</span>()</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; $`5710aa44-281f-49fe-bfa6-69e66bb55b11`</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; &lt;Azure subscription 5710aa44-281f-49fe-bfa6-69e66bb55b11&gt;</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt;   authorization_source: RoleBased</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt;   name: Visual Studio Ultimate with MSDN</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt;   policies: list(locationPlacementId, quotaId, spendingLimit)</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt;   state: Enabled</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; ---</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt;   Methods:</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt;     create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt;     list_locations, list_resource_groups, list_resources</span></span>
-<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt; </span></span>
-<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; $`e26f4a80-370f-4a77-88df-5a8d291cd2f9`</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt; &lt;Azure subscription e26f4a80-370f-4a77-88df-5a8d291cd2f9&gt;</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt;   authorization_source: RoleBased</span></span>
-<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt;   name: ADLTrainingMS</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt;   policies: list(locationPlacementId, quotaId, spendingLimit)</span></span>
-<span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt;   state: Enabled</span></span>
-<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt; ---</span></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt;   Methods:</span></span>
-<span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt;     create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,</span></span>
-<span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt;     list_locations, list_resource_groups, list_resources</span></span>
-<span id="cb2-24"><a href="#cb2-24"></a><span class="co">#&gt; </span></span>
-<span id="cb2-25"><a href="#cb2-25"></a><span class="co">#&gt; ...</span></span></code></pre></div>
-<p>Notice that AzureRMR is based on R6 classes, where methods are part of the object itself (much like objects in C++, C# and Java). Thus <code>list_subscriptions</code> is a member of the <code>az</code> object, and we call it with <code>az$list_subscriptions()</code>. R6 is used because it allows objects to have persistent state; in this case, the objects in R represent corresponding objects in Azure.</p>
-<p>The <code>list_subscriptions()</code> call returns a list of subscription objects. You can retrieve the details for a single subscription with <code>get_subscription</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># get a subscription</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a>(sub1 &lt;-<span class="st"> </span>az<span class="op">$</span><span class="kw">get_subscription</span>(<span class="st">&quot;5710aa44-281f-49fe-bfa6-69e66bb55b11&quot;</span>))</span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; &lt;Azure subscription 5710aa44-281f-49fe-bfa6-69e66bb55b11&gt;</span></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt;   authorization_source: Legacy</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt;   name: Visual Studio Ultimate with MSDN</span></span>
-<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt;   policies: list(locationPlacementId, quotaId, spendingLimit)</span></span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt;   state: Enabled</span></span>
-<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt; ---</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt;   Methods:</span></span>
-<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt;     create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,</span></span>
-<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt;     list_locations, list_resource_groups, list_resources</span></span></code></pre></div>
-<p>A subscription object in turn has methods to get, create and delete resource groups (and also list all resource groups):</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>(rg &lt;-<span class="st"> </span>sub1<span class="op">$</span><span class="kw">get_resource_group</span>(<span class="st">&quot;rdev1&quot;</span>))</span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; &lt;Azure resource group rdev1&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt;   id: /subscriptions/5710aa44-281f-49fe-bfa6-69e66bb55b11/resourceGroups/rdev1</span></span>
-<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt;   location: australiaeast</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt;   properties: list(provisioningState)</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt; ---</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt;   Methods:</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt;     check, create_resource, delete, delete_resource, delete_template, deploy_template, get_resource,</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt;     get_template, list_resources, list_templates</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="co"># create and delete a resource group</span></span>
-<span id="cb4-12"><a href="#cb4-12"></a>test &lt;-<span class="st"> </span>sub1<span class="op">$</span><span class="kw">create_resource_group</span>(<span class="st">&quot;test_group&quot;</span>)</span>
-<span id="cb4-13"><a href="#cb4-13"></a>test<span class="op">$</span><span class="kw">delete</span>(<span class="dt">confirm=</span><span class="ot">FALSE</span>)</span></code></pre></div>
+<p>AzureRMR allows you to work with your subscriptions and resource
+groups. Note that if you created your service principal via the cloud
+shell, as described in this vignette, you probably only have access to
+one subscription. Regardless, you can list all subscriptions that you
+can work with:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># all subscriptions</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>az<span class="sc">$</span><span class="fu">list_subscriptions</span>()</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; $`5710aa44-281f-49fe-bfa6-69e66bb55b11`</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; &lt;Azure subscription 5710aa44-281f-49fe-bfa6-69e66bb55b11&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt;   authorization_source: RoleBased</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;   name: Visual Studio Ultimate with MSDN</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt;   policies: list(locationPlacementId, quotaId, spendingLimit)</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt;   state: Enabled</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;   Methods:</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt;     create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt;     list_locations, list_resource_groups, list_resources</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; $`e26f4a80-370f-4a77-88df-5a8d291cd2f9`</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; &lt;Azure subscription e26f4a80-370f-4a77-88df-5a8d291cd2f9&gt;</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;   authorization_source: RoleBased</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt;   name: ADLTrainingMS</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt;   policies: list(locationPlacementId, quotaId, spendingLimit)</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt;   state: Enabled</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt;   Methods:</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt;     create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt;     list_locations, list_resource_groups, list_resources</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; ...</span></span></code></pre></div>
+<p>Notice that AzureRMR is based on R6 classes, where methods are part
+of the object itself (much like objects in C++, C# and Java). Thus
+<code>list_subscriptions</code> is a member of the <code>az</code>
+object, and we call it with <code>az$list_subscriptions()</code>. R6 is
+used because it allows objects to have persistent state; in this case,
+the objects in R represent corresponding objects in Azure.</p>
+<p>The <code>list_subscriptions()</code> call returns a list of
+subscription objects. You can retrieve the details for a single
+subscription with <code>get_subscription</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># get a subscription</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>(sub1 <span class="ot">&lt;-</span> az<span class="sc">$</span><span class="fu">get_subscription</span>(<span class="st">&quot;5710aa44-281f-49fe-bfa6-69e66bb55b11&quot;</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; &lt;Azure subscription 5710aa44-281f-49fe-bfa6-69e66bb55b11&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt;   authorization_source: Legacy</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt;   name: Visual Studio Ultimate with MSDN</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt;   policies: list(locationPlacementId, quotaId, spendingLimit)</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt;   state: Enabled</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt;   Methods:</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt;     create_resource_group, delete_resource_group, get_provider_api_version, get_resource_group,</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt;     list_locations, list_resource_groups, list_resources</span></span></code></pre></div>
+<p>A subscription object in turn has methods to get, create and delete
+resource groups (and also list all resource groups):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>(rg <span class="ot">&lt;-</span> sub1<span class="sc">$</span><span class="fu">get_resource_group</span>(<span class="st">&quot;rdev1&quot;</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; &lt;Azure resource group rdev1&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt;   id: /subscriptions/5710aa44-281f-49fe-bfa6-69e66bb55b11/resourceGroups/rdev1</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt;   location: australiaeast</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt;   properties: list(provisioningState)</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt;   Methods:</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt;     check, create_resource, delete, delete_resource, delete_template, deploy_template, get_resource,</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;     get_template, list_resources, list_templates</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co"># create and delete a resource group</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>test <span class="ot">&lt;-</span> sub1<span class="sc">$</span><span class="fu">create_resource_group</span>(<span class="st">&quot;test_group&quot;</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>test<span class="sc">$</span><span class="fu">delete</span>(<span class="at">confirm=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
 <div id="resources-and-templates" class="section level2">
 <h2>Resources and templates</h2>
-<p>Methods for working with resources and templates are exposed as part of the <code>az_resource_group</code> class. You can retrieve an existing resource/template, create a new one, or delete an existing one. Below is a short introduction to resources; for templates, see the “Working with templates” vignette.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>(stor &lt;-<span class="st"> </span>rg<span class="op">$</span><span class="kw">get_resource</span>(<span class="dt">type=</span><span class="st">&quot;Microsoft.Storage/storageServices&quot;</span>, <span class="dt">name=</span><span class="st">&quot;rdevstor1&quot;</span>))</span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; &lt;Azure resource Microsoft.Storage/storageAccounts/rdevstor1&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt;   id: /subscriptions/5710aa44-281f-49fe-bfa6-69e66bb55b11/resourceGroups/rdev1/providers/Microsoft.Sto ...</span></span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt;   is_synced: TRUE</span></span>
-<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt;   kind: Storage</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt;   location: australiasoutheast</span></span>
-<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt;   properties: list(networkAcls, trustedDirectories, supportsHttpsTrafficOnly, encryption,</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt;     provisioningState, creationTime, primaryEndpoints, primaryLocation, statusOfPrimary)</span></span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt;   sku: list(name, tier)</span></span>
-<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt;   tags: list()</span></span>
-<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; ---</span></span>
-<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt;   Methods:</span></span>
-<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt;     check, delete, do_operation, set_api_version, sync_fields, update</span></span></code></pre></div>
-<p>One benefit of the syntax that AzureRMR uses is that <em>method chaining</em> works. This is the OOP version of pipelines, which most R users will recognise from the tidyverse.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># use method chaining to get a resource without creating a bunch of intermediaries</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="co"># same result as above</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a>stor &lt;-<span class="st"> </span>az<span class="op">$</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="st">    </span><span class="kw">get_subscription</span>(<span class="st">&quot;5710aa44-281f-49fe-bfa6-69e66bb55b11&quot;</span>)<span class="op">$</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="st">    </span><span class="kw">get_resource_group</span>(<span class="st">&quot;rdev1&quot;</span>)<span class="op">$</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="st">    </span><span class="kw">get_resource</span>(<span class="dt">type=</span><span class="st">&quot;Microsoft.Storage/storageServices&quot;</span>, <span class="dt">name=</span><span class="st">&quot;rdevstor1&quot;</span>)</span></code></pre></div>
-<p>Once we have a resource, we can do <em>things</em> with it, via the <code>do_operation()</code> method. In this case, we have a storage account. One of the things we can do with a storage account is retrieve its access keys:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>stor<span class="op">$</span><span class="kw">do_operation</span>(<span class="st">&quot;listKeys&quot;</span>, <span class="dt">http_verb=</span><span class="st">&quot;POST&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="co">#&gt;  $`keys`</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt;  $`keys`[[1]]</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt;  $`keys`[[1]]$`keyName`</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt;  [1] &quot;key1&quot;</span></span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="co">#&gt;  </span></span>
-<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt;  $`keys`[[1]]$value</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt;  [1] &quot;k0gGFi8LirKcDNe73fzwDzhZ2+4oRKzvz+6+Pfn2ZCKO/JLnpyBSpVO7btLxBXQj+j8MZatDTGZ2NXUItye/vA==&quot;</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt;  </span></span>
-<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt;  $`keys`[[1]]$permissions</span></span>
-<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt;  [1] &quot;FULL&quot;</span></span>
-<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt; ...</span></span></code></pre></div>
-<p>Here is another example. If we have a virtual machine, we can start it, execute shell commands, and then shut it down again:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>vm &lt;-<span class="st"> </span>rg<span class="op">$</span><span class="kw">get_resource</span>(<span class="dt">type=</span><span class="st">&quot;Microsoft.Compute/virtualMachines&quot;</span>,</span>
-<span id="cb8-2"><a href="#cb8-2"></a>    <span class="dt">name=</span><span class="st">&quot;myVirtualMachine&quot;</span>)</span>
-<span id="cb8-3"><a href="#cb8-3"></a></span>
-<span id="cb8-4"><a href="#cb8-4"></a>vm<span class="op">$</span><span class="kw">do_operation</span>(<span class="st">&quot;start&quot;</span>, <span class="dt">http_verb=</span><span class="st">&quot;POST&quot;</span>) <span class="co"># may take a while</span></span>
-<span id="cb8-5"><a href="#cb8-5"></a>vm<span class="op">$</span><span class="kw">do_operation</span>(<span class="st">&quot;runCommand&quot;</span>,</span>
-<span id="cb8-6"><a href="#cb8-6"></a>    <span class="dt">body=</span><span class="kw">list</span>(</span>
-<span id="cb8-7"><a href="#cb8-7"></a>        <span class="dt">commandId=</span><span class="st">&quot;RunShellScript&quot;</span>, <span class="co"># RunPowerShellScript for Windows</span></span>
-<span id="cb8-8"><a href="#cb8-8"></a>        <span class="dt">script=</span><span class="kw">as.list</span>(<span class="st">&quot;ifconfig &gt; /tmp/ifconfig.out&quot;</span>)</span>
-<span id="cb8-9"><a href="#cb8-9"></a>    ),</span>
-<span id="cb8-10"><a href="#cb8-10"></a>    <span class="dt">encode=</span><span class="st">&quot;json&quot;</span>,</span>
-<span id="cb8-11"><a href="#cb8-11"></a>    <span class="dt">http_verb=</span><span class="st">&quot;POST&quot;</span>)</span>
-<span id="cb8-12"><a href="#cb8-12"></a>vm<span class="op">$</span><span class="kw">do_operation</span>(<span class="st">&quot;powerOff&quot;</span>, <span class="dt">http_verb=</span><span class="st">&quot;POST&quot;</span>)</span></code></pre></div>
-<p>For the types of operations you can carry out on a resource, consult the <a href="https://docs.microsoft.com/en-us/rest/api/?view=Azure">Azure REST API documentation</a>.</p>
-<p>You can also interrogate the fields of a resource object; in particular the <code>properties</code> field can contain arbitrary information about an Azure resource. For example, a storage account’s properties includes the endpoint URIs, and a virtual machine’s properties includes its admin login details.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># file and blob storage endpoint</span></span>
-<span id="cb9-2"><a href="#cb9-2"></a>stor<span class="op">$</span>properties<span class="op">$</span>primaryEndpoints<span class="op">$</span>file</span>
-<span id="cb9-3"><a href="#cb9-3"></a>stor<span class="op">$</span>properties<span class="op">$</span>primaryEndpoints<span class="op">$</span>blob</span>
-<span id="cb9-4"><a href="#cb9-4"></a></span>
-<span id="cb9-5"><a href="#cb9-5"></a><span class="co"># OS profile for a VM: includes login details</span></span>
-<span id="cb9-6"><a href="#cb9-6"></a>vm<span class="op">$</span>properties<span class="op">$</span>osProfile</span></code></pre></div>
+<p>Methods for working with resources and templates are exposed as part
+of the <code>az_resource_group</code> class. You can retrieve an
+existing resource/template, create a new one, or delete an existing one.
+Below is a short introduction to resources; for templates, see the
+“Working with templates” vignette.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>(stor <span class="ot">&lt;-</span> rg<span class="sc">$</span><span class="fu">get_resource</span>(<span class="at">type=</span><span class="st">&quot;Microsoft.Storage/storageServices&quot;</span>, <span class="at">name=</span><span class="st">&quot;rdevstor1&quot;</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; &lt;Azure resource Microsoft.Storage/storageAccounts/rdevstor1&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt;   id: /subscriptions/5710aa44-281f-49fe-bfa6-69e66bb55b11/resourceGroups/rdev1/providers/Microsoft.Sto ...</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt;   is_synced: TRUE</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt;   kind: Storage</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt;   location: australiasoutheast</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt;   properties: list(networkAcls, trustedDirectories, supportsHttpsTrafficOnly, encryption,</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt;     provisioningState, creationTime, primaryEndpoints, primaryLocation, statusOfPrimary)</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt;   sku: list(name, tier)</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt;   tags: list()</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt;   Methods:</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt;     check, delete, do_operation, set_api_version, sync_fields, update</span></span></code></pre></div>
+<p>One benefit of the syntax that AzureRMR uses is that <em>method
+chaining</em> works. This is the OOP version of pipelines, which most R
+users will recognise from the tidyverse.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># use method chaining to get a resource without creating a bunch of intermediaries</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co"># same result as above</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>stor <span class="ot">&lt;-</span> az<span class="sc">$</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="fu">get_subscription</span>(<span class="st">&quot;5710aa44-281f-49fe-bfa6-69e66bb55b11&quot;</span>)<span class="sc">$</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="fu">get_resource_group</span>(<span class="st">&quot;rdev1&quot;</span>)<span class="sc">$</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    <span class="fu">get_resource</span>(<span class="at">type=</span><span class="st">&quot;Microsoft.Storage/storageServices&quot;</span>, <span class="at">name=</span><span class="st">&quot;rdevstor1&quot;</span>)</span></code></pre></div>
+<p>Once we have a resource, we can do <em>things</em> with it, via the
+<code>do_operation()</code> method. In this case, we have a storage
+account. One of the things we can do with a storage account is retrieve
+its access keys:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>stor<span class="sc">$</span><span class="fu">do_operation</span>(<span class="st">&quot;listKeys&quot;</span>, <span class="at">http_verb=</span><span class="st">&quot;POST&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt;  $`keys`</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt;  $`keys`[[1]]</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt;  $`keys`[[1]]$`keyName`</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;key1&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt;  $`keys`[[1]]$value</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;k0gGFi8LirKcDNe73fzwDzhZ2+4oRKzvz+6+Pfn2ZCKO/JLnpyBSpVO7btLxBXQj+j8MZatDTGZ2NXUItye/vA==&quot;</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt;  $`keys`[[1]]$permissions</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;FULL&quot;</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; ...</span></span></code></pre></div>
+<p>Here is another example. If we have a virtual machine, we can start
+it, execute shell commands, and then shut it down again:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>vm <span class="ot">&lt;-</span> rg<span class="sc">$</span><span class="fu">get_resource</span>(<span class="at">type=</span><span class="st">&quot;Microsoft.Compute/virtualMachines&quot;</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;myVirtualMachine&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>vm<span class="sc">$</span><span class="fu">do_operation</span>(<span class="st">&quot;start&quot;</span>, <span class="at">http_verb=</span><span class="st">&quot;POST&quot;</span>) <span class="co"># may take a while</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>vm<span class="sc">$</span><span class="fu">do_operation</span>(<span class="st">&quot;runCommand&quot;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>    <span class="at">body=</span><span class="fu">list</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>        <span class="at">commandId=</span><span class="st">&quot;RunShellScript&quot;</span>, <span class="co"># RunPowerShellScript for Windows</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>        <span class="at">script=</span><span class="fu">as.list</span>(<span class="st">&quot;ifconfig &gt; /tmp/ifconfig.out&quot;</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    ),</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="at">encode=</span><span class="st">&quot;json&quot;</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="at">http_verb=</span><span class="st">&quot;POST&quot;</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>vm<span class="sc">$</span><span class="fu">do_operation</span>(<span class="st">&quot;powerOff&quot;</span>, <span class="at">http_verb=</span><span class="st">&quot;POST&quot;</span>)</span></code></pre></div>
+<p>For the types of operations you can carry out on a resource, consult
+the <a href="https://learn.microsoft.com/en-us/rest/api/?view=Azure">Azure REST
+API documentation</a>.</p>
+<p>You can also interrogate the fields of a resource object; in
+particular the <code>properties</code> field can contain arbitrary
+information about an Azure resource. For example, a storage account’s
+properties includes the endpoint URIs, and a virtual machine’s
+properties includes its admin login details.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># file and blob storage endpoint</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>stor<span class="sc">$</span>properties<span class="sc">$</span>primaryEndpoints<span class="sc">$</span>file</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>stor<span class="sc">$</span>properties<span class="sc">$</span>primaryEndpoints<span class="sc">$</span>blob</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co"># OS profile for a VM: includes login details</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>vm<span class="sc">$</span>properties<span class="sc">$</span>osProfile</span></code></pre></div>
 </div>
 <div id="common-methods" class="section level2">
 <h2>Common methods</h2>
-<p>The following types of functionality apply at multiple levels: resource, resource group and/or subscription.</p>
+<p>The following types of functionality apply at multiple levels:
+resource, resource group and/or subscription.</p>
 <div id="tagging" class="section level3">
 <h3>Tagging</h3>
-<p>Resources and resource groups can be assigned <em>tags</em>. Tags are labels that help admins to organise and categorise Azure resources. To set and unset tags, use the <code>set_tags</code> method, and to view them, use <code>get_tags</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>rg<span class="op">$</span><span class="kw">set_tags</span>(<span class="dt">comment1=</span><span class="st">&quot;hello world!&quot;</span>, <span class="dt">created_by=</span><span class="st">&quot;AzureRMR&quot;</span>)</span>
-<span id="cb10-2"><a href="#cb10-2"></a></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="co"># a name-only comment</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a>rg<span class="op">$</span><span class="kw">set_tags</span>(comment2)</span>
-<span id="cb10-5"><a href="#cb10-5"></a></span>
-<span id="cb10-6"><a href="#cb10-6"></a><span class="co"># to unset a tag, set it to NULL</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a>rg<span class="op">$</span><span class="kw">set_tags</span>(<span class="dt">created_by=</span><span class="ot">NULL</span>)</span>
-<span id="cb10-8"><a href="#cb10-8"></a></span>
-<span id="cb10-9"><a href="#cb10-9"></a><span class="co"># see the tags</span></span>
-<span id="cb10-10"><a href="#cb10-10"></a>rg<span class="op">$</span><span class="kw">get_tags</span>()</span>
-<span id="cb10-11"><a href="#cb10-11"></a><span class="co">#&gt; $comment1</span></span>
-<span id="cb10-12"><a href="#cb10-12"></a><span class="co">#&gt; [1] &quot;hello world!&quot;</span></span>
-<span id="cb10-13"><a href="#cb10-13"></a><span class="co">#&gt; </span></span>
-<span id="cb10-14"><a href="#cb10-14"></a><span class="co">#&gt; $comment2</span></span>
-<span id="cb10-15"><a href="#cb10-15"></a><span class="co">#&gt; [1] &quot;&quot;</span></span>
-<span id="cb10-16"><a href="#cb10-16"></a></span>
-<span id="cb10-17"><a href="#cb10-17"></a><span class="co"># specify keep_existing=FALSE to unset all existing tags</span></span>
-<span id="cb10-18"><a href="#cb10-18"></a>rg<span class="op">$</span><span class="kw">set_tags</span>(<span class="dt">newcomment=</span><span class="st">&quot;my new comment&quot;</span>, <span class="dt">keep_existing=</span><span class="ot">FALSE</span>)</span></code></pre></div>
+<p>Resources and resource groups can be assigned <em>tags</em>. Tags are
+labels that help admins to organise and categorise Azure resources. To
+set and unset tags, use the <code>set_tags</code> method, and to view
+them, use <code>get_tags</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">set_tags</span>(<span class="at">comment1=</span><span class="st">&quot;hello world!&quot;</span>, <span class="at">created_by=</span><span class="st">&quot;AzureRMR&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co"># a name-only comment</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">set_tags</span>(comment2)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co"># to unset a tag, set it to NULL</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">set_tags</span>(<span class="at">created_by=</span><span class="cn">NULL</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co"># see the tags</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">get_tags</span>()</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; $comment1</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;hello world!&quot;</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co">#&gt; $comment2</span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;&quot;</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a><span class="co"># specify keep_existing=FALSE to unset all existing tags</span></span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">set_tags</span>(<span class="at">newcomment=</span><span class="st">&quot;my new comment&quot;</span>, <span class="at">keep_existing=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
 <div id="locking" class="section level3">
 <h3>Locking</h3>
-<p>As of version 2.0.0, AzureRMR includes the ability to lock and unlock subscriptions, resource groups and resources. The methods involved are:</p>
+<p>As of version 2.0.0, AzureRMR includes the ability to lock and unlock
+subscriptions, resource groups and resources. The methods involved
+are:</p>
 <ul>
-<li><code>create_lock(name, level)</code>: Create a management lock on this object. The <code>level</code> argument can be either “cannotdelete” or “readonly”.</li>
+<li><code>create_lock(name, level)</code>: Create a management lock on
+this object. The <code>level</code> argument can be either
+“cannotdelete” or “readonly”.</li>
 <li><code>get_lock(name</code>): Returns a management lock object.</li>
-<li><code>delete_lock(name)</code>: Deletes a management lock object.</li>
-<li><code>list_locks()</code>: List all locks that apply to this object.</li>
+<li><code>delete_lock(name)</code>: Deletes a management lock
+object.</li>
+<li><code>list_locks()</code>: List all locks that apply to this
+object.</li>
 </ul>
-<p>Locks applied to a resource group also apply to all its resources, and similarly locks applied to a subscription also apply to all its resource groups (and resources). If you logged in via a custom service principal, it must have “Owner” or “User Access Administrator” access to manage locks.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># protect this resource group and its resources against deletion</span></span>
-<span id="cb11-2"><a href="#cb11-2"></a>rg<span class="op">$</span><span class="kw">create_lock</span>(<span class="st">&quot;mylock&quot;</span>, <span class="st">&quot;cannotdelete&quot;</span>)</span>
-<span id="cb11-3"><a href="#cb11-3"></a></span>
-<span id="cb11-4"><a href="#cb11-4"></a>rg<span class="op">$</span><span class="kw">list_locks</span>()</span>
-<span id="cb11-5"><a href="#cb11-5"></a></span>
-<span id="cb11-6"><a href="#cb11-6"></a>rg<span class="op">$</span><span class="kw">delete_lock</span>(<span class="st">&quot;mylock&quot;</span>)</span></code></pre></div>
+<p>Locks applied to a resource group also apply to all its resources,
+and similarly locks applied to a subscription also apply to all its
+resource groups (and resources). If you logged in via a custom service
+principal, it must have “Owner” or “User Access Administrator” access to
+manage locks.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># protect this resource group and its resources against deletion</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">create_lock</span>(<span class="st">&quot;mylock&quot;</span>, <span class="st">&quot;cannotdelete&quot;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">list_locks</span>()</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">delete_lock</span>(<span class="st">&quot;mylock&quot;</span>)</span></code></pre></div>
 </div>
 <div id="role-based-access-control" class="section level3">
 <h3>Role-based access control</h3>
-<p>As of version 2.1.0, AzureRMR includes limited support for <a href="https://docs.microsoft.com/en-us/azure/role-based-access-control/overview">role-based access control</a> (RBAC). You can read role definitions, and read, add and remove role assignments. This applies to subscription, resource group and resource objects.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>rg<span class="op">$</span><span class="kw">list_role_definitions</span>()</span>
-<span id="cb12-2"><a href="#cb12-2"></a><span class="co">#&gt;                          definition_id                                                name</span></span>
-<span id="cb12-3"><a href="#cb12-3"></a><span class="co">#&gt; 1 a7b1b19a-0e83-4fe5-935c-faaefbfd18c3                                Avere Cluster Create</span></span>
-<span id="cb12-4"><a href="#cb12-4"></a><span class="co">#&gt; 2 e078ab98-ef3a-4c9a-aba7-12f5172b45d0                      Avere Cluster Runtime Operator</span></span>
-<span id="cb12-5"><a href="#cb12-5"></a><span class="co">#&gt; 3 21d96096-b162-414a-8302-d8354f9d91b2 Azure Service Deploy Release Management Contributor</span></span>
-<span id="cb12-6"><a href="#cb12-6"></a><span class="co">#&gt; 4 7b266cd7-0bba-4ae2-8423-90ede5e1e898                                     CAL-Custom-Role</span></span>
-<span id="cb12-7"><a href="#cb12-7"></a><span class="co">#&gt; 5 b91f4c0b-46e3-47bb-a242-eecfe23b3b5b                              Dsms Role (deprecated)</span></span>
-<span id="cb12-8"><a href="#cb12-8"></a><span class="co">#&gt; ...</span></span>
-<span id="cb12-9"><a href="#cb12-9"></a></span>
-<span id="cb12-10"><a href="#cb12-10"></a>rg<span class="op">$</span><span class="kw">get_role_definition</span>(<span class="st">&quot;Reader&quot;</span>)</span>
-<span id="cb12-11"><a href="#cb12-11"></a><span class="co">#&gt; &lt;Azure role definition&gt;</span></span>
-<span id="cb12-12"><a href="#cb12-12"></a><span class="co">#&gt;   role: Reader</span></span>
-<span id="cb12-13"><a href="#cb12-13"></a><span class="co">#&gt;   description: Lets you view everything, but not make any changes.</span></span>
-<span id="cb12-14"><a href="#cb12-14"></a><span class="co">#&gt;   role definition ID: acdd72a7-3385-48ef-bd42-f606fba81ae7</span></span>
-<span id="cb12-15"><a href="#cb12-15"></a></span>
-<span id="cb12-16"><a href="#cb12-16"></a><span class="co"># assign Reader role to the principal with the given ID</span></span>
-<span id="cb12-17"><a href="#cb12-17"></a>rg<span class="op">$</span><span class="kw">add_role_assignment</span>(<span class="st">&quot;041ff2be-4eb0-11e9-8f38-394fbcd0b29d&quot;</span>, <span class="st">&quot;Reader&quot;</span>)</span></code></pre></div>
-<p>You can assign roles to either a user or a service principal, although note that the ID of a service principal is <em>not</em> the app ID of its corresponding registered app. The AzureGraph package can help you in specifying the principal to which to assign a role.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>gr &lt;-<span class="st"> </span>AzureGraph<span class="op">::</span><span class="kw">get_graph_login</span>()</span>
-<span id="cb13-2"><a href="#cb13-2"></a></span>
-<span id="cb13-3"><a href="#cb13-3"></a><span class="co"># can get a user by their email address</span></span>
-<span id="cb13-4"><a href="#cb13-4"></a>usr &lt;-<span class="st"> </span>gr<span class="op">$</span><span class="kw">get_user</span>(<span class="st">&quot;username@aadtenant.com&quot;</span>)</span>
-<span id="cb13-5"><a href="#cb13-5"></a></span>
-<span id="cb13-6"><a href="#cb13-6"></a><span class="co"># get the service principal for an app by its app ID</span></span>
-<span id="cb13-7"><a href="#cb13-7"></a>svc &lt;-<span class="st"> </span>gr<span class="op">$</span><span class="kw">get_service_principal</span>(<span class="dt">app_id=</span><span class="st">&quot;b9ed4812-4eba-11e9-9a1e-1fda262d9c77&quot;</span>)</span>
-<span id="cb13-8"><a href="#cb13-8"></a></span>
-<span id="cb13-9"><a href="#cb13-9"></a>rg<span class="op">$</span><span class="kw">add_role_assignment</span>(usr, <span class="st">&quot;Reader&quot;</span>)</span>
-<span id="cb13-10"><a href="#cb13-10"></a>rg<span class="op">$</span><span class="kw">add_role_assignment</span>(svc, <span class="st">&quot;Contributor&quot;</span>)</span></code></pre></div>
-<p>Technically role definitions and assignments are <em>resources</em> and could be manipulated as such, but AzureRMR currently treats them as independent classes.</p>
+<p>As of version 2.1.0, AzureRMR includes limited support for <a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/overview">role-based
+access control</a> (RBAC). You can read role definitions, and read, add
+and remove role assignments. This applies to subscription, resource
+group and resource objects.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">list_role_definitions</span>()</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt;                          definition_id                                                name</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; 1 a7b1b19a-0e83-4fe5-935c-faaefbfd18c3                                Avere Cluster Create</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; 2 e078ab98-ef3a-4c9a-aba7-12f5172b45d0                      Avere Cluster Runtime Operator</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; 3 21d96096-b162-414a-8302-d8354f9d91b2 Azure Service Deploy Release Management Contributor</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; 4 7b266cd7-0bba-4ae2-8423-90ede5e1e898                                     CAL-Custom-Role</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; 5 b91f4c0b-46e3-47bb-a242-eecfe23b3b5b                              Dsms Role (deprecated)</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; ...</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">get_role_definition</span>(<span class="st">&quot;Reader&quot;</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt; &lt;Azure role definition&gt;</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt;   role: Reader</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt;   description: Lets you view everything, but not make any changes.</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt;   role definition ID: acdd72a7-3385-48ef-bd42-f606fba81ae7</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co"># assign Reader role to the principal with the given ID</span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">add_role_assignment</span>(<span class="st">&quot;041ff2be-4eb0-11e9-8f38-394fbcd0b29d&quot;</span>, <span class="st">&quot;Reader&quot;</span>)</span></code></pre></div>
+<p>You can assign roles to either a user or a service principal,
+although note that the ID of a service principal is <em>not</em> the app
+ID of its corresponding registered app. The AzureGraph package can help
+you in specifying the principal to which to assign a role.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>gr <span class="ot">&lt;-</span> AzureGraph<span class="sc">::</span><span class="fu">get_graph_login</span>()</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co"># can get a user by their email address</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>usr <span class="ot">&lt;-</span> gr<span class="sc">$</span><span class="fu">get_user</span>(<span class="st">&quot;username@aadtenant.com&quot;</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co"># get the service principal for an app by its app ID</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>svc <span class="ot">&lt;-</span> gr<span class="sc">$</span><span class="fu">get_service_principal</span>(<span class="at">app_id=</span><span class="st">&quot;b9ed4812-4eba-11e9-9a1e-1fda262d9c77&quot;</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">add_role_assignment</span>(usr, <span class="st">&quot;Reader&quot;</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a>rg<span class="sc">$</span><span class="fu">add_role_assignment</span>(svc, <span class="st">&quot;Contributor&quot;</span>)</span></code></pre></div>
+<p>Technically role definitions and assignments are <em>resources</em>
+and could be manipulated as such, but AzureRMR currently treats them as
+independent classes.</p>
 </div>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
-<p>This has been a quick introduction to the features of AzureRMR. Remember that this package is only meant to be a generic mechanism for working with Resource Manager. You can extend it to provide support for service-specific features; examples of packages that do this include <a href="https://github.com/cloudyr/AzureVM">AzureVM</a> for <a href="https://azure.microsoft.com/en-us/services/virtual-machines/">virtual machines</a>, and <a href="https://github.com/cloudyr/AzureStor">AzureStor</a> for <a href="https://azure.microsoft.com/en-us/product-categories/storage/">storage accounts</a>. For more information, see the “Extending AzureRMR” vignette.</p>
+<p>This has been a quick introduction to the features of AzureRMR.
+Remember that this package is only meant to be a generic mechanism for
+working with Resource Manager. You can extend it to provide support for
+service-specific features; examples of packages that do this include <a href="https://github.com/cloudyr/AzureVM">AzureVM</a> for <a href="https://azure.microsoft.com/en-us/products/virtual-machines/">virtual
+machines</a>, and <a href="https://github.com/cloudyr/AzureStor">AzureStor</a> for <a href="https://azure.microsoft.com/en-us/products/category/storage/">storage
+accounts</a>. For more information, see the “Extending AzureRMR”
+vignette.</p>
 </div>
 
 

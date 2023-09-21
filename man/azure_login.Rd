@@ -80,7 +80,7 @@ If the AzureGraph package is installed and the \code{graph_host} argument is not
 
 \section{Linux DSVM note}{
 
-If you are using a Linux \href{https://azure.microsoft.com/en-us/services/virtual-machines/data-science-virtual-machines/}{Data Science Virtual Machine} in Azure, you may have problems running \code{create_azure_login()} (ie, without any arguments). In this case, try \code{create_azure_login(auth_type="device_code")}.
+If you are using a Linux \href{https://azure.microsoft.com/en-us/products/virtual-machines/data-science-virtual-machines/}{Data Science Virtual Machine} in Azure, you may have problems running \code{create_azure_login()} (ie, without any arguments). In this case, try \code{create_azure_login(auth_type="device_code")}.
 }
 
 \examples{
@@ -104,10 +104,10 @@ az <- create_azure_login(config_file="~/creds.json")
 \seealso{
 \link{az_rm}, \link[AzureAuth:get_azure_token]{AzureAuth::get_azure_token} for more details on authentication methods, \link[AzureGraph:graph_login]{AzureGraph::create_graph_login} for the corresponding function to create a Microsoft Graph login client
 
-\href{https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview}{Azure Resource Manager overview},
-\href{https://docs.microsoft.com/en-us/rest/api/resources/}{REST API reference}
+\href{https://learn.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview}{Azure Resource Manager overview},
+\href{https://learn.microsoft.com/en-us/rest/api/resources/}{REST API reference}
 
-\href{https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-scenarios}{Authentication in Azure Active Directory}
+\href{https://learn.microsoft.com/en-us/azure/active-directory/develop/authentication-scenarios}{Authentication in Azure Active Directory}
 
-\href{https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest}{Azure CLI documentation}
+\href{https://learn.microsoft.com/en-us/cli/azure/?view=azure-cli-latest}{Azure CLI documentation}
 }
